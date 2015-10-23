@@ -39,7 +39,7 @@
 		  <div class="panel panel-info">
 		  <div class="panel-heading"><b>Top 5 Games</b></div>
 		  <div class="panel-body">
-			<div class="list-group" ng-repeat="game in games | limitTo:5">
+			<div class="list-group" ng-repeat="game in topFiveGames">
 			  <a ng-href="/game/{{game.gameKey}}" class="list-group-item">
 				<span class="badge">{{ game.voteTotal }}</span>
 				{{ game.gameName }}
@@ -48,9 +48,9 @@
 		  </div>
 		</div>
 		<div class="panel active">
-		  <div class="panel-heading">The rest of the games</div>
+		  <div class="panel-heading">Full list of games</div>
 		  <div class="panel-body">
-			<div class="list-group" ng-repeat="game in games | limitTo:500:5">
+			<div class="list-group" ng-repeat="game in games">
 			  <a ng-href="/game/{{game.gameKey}}" class="list-group-item">
 				<span class="badge">{{ game.voteTotal }}</span>
 				{{ game.gameName }}

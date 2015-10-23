@@ -36,6 +36,7 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
     $scope.$routeParams = $routeParams;
 	
 	$scope.games = [];
+	$scope.topFiveGames = [];
 	$scope.people =[];
 	$scope.selectedPerson = null;
 
@@ -45,6 +46,10 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 
 	$scope.$on('UpdateGames', function(event, value){
 		$scope.games = value;
+	});
+
+	$scope.$on('UpdateTopFiveGames', function(event, value){
+		$scope.topFiveGames = value;
 	});
 
 	$scope.$on('UpdatePeople', function(event, value){
@@ -74,6 +79,10 @@ lanoelApp.controller('GameController', function($scope, $http, $routeParams) {
 		$scope.games = value;
 	});
 
+	$scope.$on('UpdateTopFiveGames', function(event, value){
+		$scope.topFiveGames = value;
+	});
+
 	$http({
 			method: 'GET',
 			url: 'http://lanoel.elasticbeanstalk.com/lanoel/game/' + $routeParams.gameKey ,
@@ -99,6 +108,7 @@ lanoelApp.controller('GameController', function($scope, $http, $routeParams) {
 lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $filter) {
 	$scope.selectedPerson = null;
 	$scope.games = [];
+	$scope.topFiveGames = [];
 
 	updatePerson($scope, $http, $routeParams);
 	updateGames($scope, $http);
@@ -175,6 +185,10 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 		$scope.games = value;
 	});
 
+	$scope.$on('UpdateTopFiveGames', function(event, value){
+		$scope.topFiveGames = value;
+	});
+
 	$http({
 			method: 'GET',
 			url: 'http://lanoel.elasticbeanstalk.com/lanoel/person/' + $routeParams.personKey ,
@@ -234,6 +248,16 @@ function updateGames($scope, $http)
 			console.log("After updateGames, result: " + JSON.stringify(result));
 			$scope.games = result.sort(compareGames);
 			$scope.$emit('UpdateGames', $scope.games);
+	});
+
+	$http({
+			method: 'GET',
+			url: 'http://lanoel.elasticbeanstalk.com/lanoel/topfivegames',
+			data: { }
+		}).success(function (result) {
+			console.log("After Top Five Games, result: " + JSON.stringify(result));
+			$scope.topFiveGames = result;
+			$scope.$emit('UpdateTopFiveGames', $scope.topFiveGames);
 	});
 }
 
