@@ -1,11 +1,12 @@
 <div class="container-fluid">
 	<div class="row">
+
 		<br/>
 		<br/>
 	</div>
 	<div class="jumbotron">
 	  <p>2015: The year of PAT!</p>
-	</div>
+</div>
 	<div class="row">
 	  <div class="col-lg-6">
 		<div class="well bs-component">
@@ -37,7 +38,7 @@
 		  <div class="panel panel-info">
 		  <div class="panel-heading"><b>LANoel 2015 Games</b></div>
 		  <div class="panel-body">
-			<div class="list-group" ng-repeat="game in games | limitTo:5">
+			<div class="list-group" ng-repeat="game in topFiveGames">
 			  <a ng-href="/game/{{game.gameKey}}" class="list-group-item">
 				<span class="badge">{{ game.voteTotal }}</span>
 				{{ game.gameName }}
@@ -46,9 +47,11 @@
 		  </div>
 		</div>
 		<div class="panel active">
+
 		  <div class="panel-heading">All Games</div>
+
 		  <div class="panel-body">
-			<div class="list-group" ng-repeat="game in games | limitTo:500:5">
+			<div class="list-group" ng-repeat="game in games">
 			  <a ng-href="/game/{{game.gameKey}}" class="list-group-item">
 				<span class="badge">{{ game.voteTotal }}</span>
 				{{ game.gameName }}

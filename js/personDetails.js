@@ -27,6 +27,7 @@
 	scotchApp.controller('mainController', function($scope) {
 		$scope.selectedGame = null;
 		$scope.games = [];
+		$scope.topFiveGames = [];
 
 		$scope.people =[];
 
@@ -37,6 +38,14 @@
 			}).success(function (result) {
 			$scope.games = result.sort(compareGames);
 		});
+
+		$http({
+			method: 'GET',
+			url: 'http://lanoel.elasticbeanstalk.com/lanoel/topfivegames',
+			data: { }
+		}).success(function (result) {
+			$scope.topFiveGames = result;
+			});
 
 		$http({
 				method: 'GET',

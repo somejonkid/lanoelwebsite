@@ -63,7 +63,7 @@
               <div class="panel panel-info">
 			  <div class="panel-heading">LANoel 2015 Games</div>
 			  <div class="panel-body">
-				<div class="list-group" ng-repeat="game in games | limitTo:5">
+				<div class="list-group" ng-repeat="game in topFiveGames">
 				  <a ng-href="/game/{{game.gameKey}}" class="list-group-item">
 					<span class="badge">{{ game.voteTotal }}</span>
 					{{ game.gameName }}
