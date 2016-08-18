@@ -1,4 +1,4 @@
-<div class="bs-docs-section">
+<div class="container-fluid">
         <div class="row">
           <div class="col-lg-12">
             <div class="page-header">
@@ -28,7 +28,7 @@
                   <div class="form-group">
                     <label for="select" class="col-lg-2 control-label has-error">First Choice</label>
                     <div class="col-lg-10">
-                      <select class="form-control" ng-model="gameVote1selection" ng-change="onGameVote1Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
+                      <select class="form-control" ng-model="gameVote1selection" ng-change="onGameVote1Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey" disabled>
                       </select>
                       <br>
                     </div>
@@ -36,7 +36,7 @@
 				  <div class="form-group">
                     <label for="select" class="col-lg-2 control-label has-warning">Second Choice</label>
                     <div class="col-lg-10">
-                      <select class="form-control" ng-model="gameVote2selection" ng-change="onGameVote2Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
+                      <select class="form-control" ng-model="gameVote2selection" ng-change="onGameVote2Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey" disabled>
                       </select>
                       <br>
                     </div>
@@ -44,7 +44,7 @@
 				  <div class="form-group">
                     <label for="select" class="col-lg-2 control-label has-success">Third Choice</label>
                     <div class="col-lg-10">
-                      <select class="form-control" ng-model="gameVote3selection" ng-change="onGameVote3Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
+                      <select class="form-control" ng-model="gameVote3selection" ng-change="onGameVote3Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey" disabled>
                       </select>
                       <br>
                     </div>
@@ -61,7 +61,7 @@
           <div class="col-lg-4 col-lg-offset-1">
 
               <div class="panel panel-info">
-			  <div class="panel-heading">Top 5 Games</div>
+			  <div class="panel-heading">LANoel 2015 Games</div>
 			  <div class="panel-body">
 				<div class="list-group" ng-repeat="game in games | limitTo:5">
 				  <a ng-href="/game/{{game.gameKey}}" class="list-group-item">

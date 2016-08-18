@@ -1,4 +1,4 @@
-var lanoelApp = angular.module('lanoel', ['ngRoute']);
+var lanoelApp = angular.module('lanoel', ['ngRoute', 'ngAnimate', 'ngDragDrop']);
 
 
 lanoelApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
@@ -21,6 +21,28 @@ lanoelApp.config(['$routeProvider', '$locationProvider', function($routeProvider
 			templateUrl : '/partials/personDetails.html',
 			controller  : 'PersonController'
 		})
+
+		.when('/tournament', {
+			templateUrl : '/partials/tournament.html',
+			controller  : 'TournamentController'
+		})
+		
+		.when('/login', {
+			templateUrl : '/partials/login.html',
+			controller  : 'LoginController'
+		})
+
+		.when('/createAccount', {
+			templateUrl : '/partials/createAccount.html',
+			controller  : 'CreateAccountController'
+		})
+
+		.when('/updatescores', {
+			templateUrl : '/partials/updateScores.html',
+			controller  : 'UpdateScoresController'
+		})
+			
+
 		.otherwise({redirectTo:'/'});
 		
 		$locationProvider.html5Mode(
@@ -43,12 +65,28 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 
 	updatePeople($scope, $http);
 
+	isUserLoggedIn($scope, $http);
+
 	$scope.$on('UpdateGames', function(event, value){
 		$scope.games = value;
 	});
 
 	$scope.$on('UpdatePeople', function(event, value){
 		$scope.people = value;
+	});
+
+	$scope.$on('Login', function(event, value){
+		console.log("entering login event handler");
+		document.getElementById("updateScoresLink").hidden = false;
+		document.getElementById("logoutLink").hidden = false;
+	});
+
+	$scope.$on('Logout', function(event, value){
+		console.log("entering logout event handler");
+		document.getElementById("updateScoresLink").hidden = true;
+		document.getElementById("logoutLink").hidden = true;
+		document.getElementById("loginLink").hidden = false;
+		$location.path('/' + person.personKey);
 	});
 
 	$scope.addNewGame = function(name)
@@ -61,6 +99,36 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 	{
 		$location.path('/person/' + person.personKey);
 	};
+
+	$scope.loginClick = function()
+	{
+		console.log("sessionstorage sessionid: " + sessionStorage.sessionid);
+		if(sessionStorage.sessionid == null)
+		{
+			$location.path('/login');
+		}
+	}
+
+	$scope.logoutClick = function()
+	{
+		console.log("logging out");
+		clearSession();
+		$location.path('/');
+	}
+
+	$scope.updateScoresClick = function()
+	{
+		$location.path('/updatescores');
+	}
+
+	$scope.isUserLoggedIn = function()
+	{
+		if(sessionStorage.sessionid == null || sessionStorage.sessionid == '')
+		{
+			return false;
+		}
+		return true;
+	}
 });
 
 lanoelApp.controller('MainController', function($scope) {
@@ -224,6 +292,245 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	};
 });
 
+lanoelApp.controller('TournamentController', function($scope, $http, $routeParams, $filter) {
+	$scope.tournament = null;
+	$scope.scores = [];
+	$scope.rounds = [];
+	$scope.selectedRound = null;
+
+	$scope.refresh = function()
+	{
+		$http({
+				method: 'GET',
+				url: 'http://lanoel.elasticbeanstalk.com/tournament/1',
+			}).success(function (result) {
+				$scope.tournament = result;
+				$scope.scores = $scope.tournament.scores;
+				
+
+				for (var i = 0; i < $scope.tournament.rounds.length ; i++)
+				{
+					var tempPlaces = [];
+					for(var j = 0; j < $scope.tournament.rounds[i].places.length; j++)
+					{
+						if($scope.tournament.rounds[i].places[j].place != 99)
+						{
+							tempPlaces.push($scope.tournament.rounds[i].places[j]);
+						}
+					}
+					$scope.tournament.rounds[i].places = tempPlaces;
+				}
+
+				$scope.rounds = $scope.tournament.rounds;
+				$scope.selectedRound = $scope.rounds[0];
+		});
+	}
+
+	$scope.refresh();
+
+    $scope.onTabClick = function(round)
+	{
+		$scope.selectedRound = round;
+		console.log("On click, current round: " + $scope.selectedRound.game.gameName);
+	}
+});
+
+lanoelApp.controller('LoginController', function($scope, $http, $routeParams, $location) {
+	$scope.user = null;
+	$scope.alerts = {};
+
+	$http({
+			method: 'GET',
+			url: 'http://lanoel.elasticbeanstalk.com/tournament/1',
+		}).success(function (result) {
+			$scope.tournament = result;
+			$scope.scores = $scope.tournament.scores;
+			$scope.rounds = $scope.tournament.rounds;
+	});
+
+	$scope.onLogin = function()
+	{
+		console.log("username: " + $scope.user.username + " password: " + $scope.user.password);
+		$http({
+			method: 'POST',
+			url: 'http://users.omegasixcloud.net/accounts/login',
+			headers : {
+				'username' : $scope.user.username,
+				'password' : $scope.user.password
+			}
+		}).success(function (data, status, headers, config) {
+			console.log("sessionid: " + headers("sessionid"));
+			setSession(headers("sessionid"), $location);
+			$scope.$emit('Login', $scope.user);
+			$location.path('/');
+			console.log("session id from storage: " + sessionStorage.sessionid);
+		})
+		.error(function(data, status, headers, config) {
+			// called asynchronously if an error occurs
+			// or server returns response with an error status.
+			console.log("login status: " + status);
+			clearSession();
+			console.log("session id from storage: " + sessionStorage.sessionid);
+			document.getElementById("loginErrorAlert").hidden = false;
+		 });
+	}
+
+	$scope.onAccountCreation = function()
+	{
+		console.log("create Account clicked!");
+		$location.path('/createAccount');
+	}
+});
+
+lanoelApp.controller('CreateAccountController', function($scope, $http, $routeParams, $location) {
+	$scope.user = null;
+
+
+	
+
+	$scope.onLogin = function()
+	{
+		console.log("username: " + $scope.user.username + " password: " + $scope.user.password);
+		$http({
+			method: 'POST',
+			url: 'http://users.omegasixcloud.net/accounts/login',
+			headers : {
+				'username' : $scope.user.username,
+				'password' : $scope.user.password
+			}
+		}).success(function (data, status, headers, config) {
+			console.log("sessionid: " + headers);
+		})
+		.error(function(data, status, headers, config) {
+			// called asynchronously if an error occurs
+			// or server returns response with an error status.
+			console.log("login status: " + status);
+		 });
+	}
+
+	$scope.onAccountCreation = function()
+	{
+		console.log("create Account clicked!");
+		$location.path('/createAccount');
+	}
+
+});
+
+lanoelApp.controller('UpdateScoresController', function($scope, $http, $routeParams, $location, $timeout) {
+	$scope.tournament = null;
+	$scope.scores = [];
+	$scope.rounds = [];
+
+	$scope.selectedRound = null;
+
+	$http({
+			method: 'GET',
+			url: 'http://lanoel.elasticbeanstalk.com/tournament/1',
+		}).success(function (result) {
+			$scope.tournament = result;
+			for(var i = 0; i < $scope.tournament.rounds.length; i++)
+			{
+				$scope.tournament.rounds[i].places = $scope.tournament.rounds[i].places.sort(comparePlaces);
+			}
+			$scope.scores = $scope.tournament.scores;
+			$scope.rounds = $scope.tournament.rounds;
+			$scope.selectedRound = $scope.rounds[0];
+	});
+
+    $scope.onTabClick = function(round)
+	{
+		$scope.selectedRound = round;
+		console.log("On click, current round: " + $scope.selectedRound.game.gameName);
+	}
+
+	$scope.onSubmit = function()
+	{
+		$scope.updateScoreValues();
+		console.log("selected round places: " + $scope.selectedRound.places);
+		$scope.postUpdateScore();		
+	}
+
+	$scope.postUpdateScore = function()
+	{
+		$http({
+				method: 'POST',
+				url: 'http://lanoel.elasticbeanstalk.com/tournament/1/' + $scope.selectedRound.roundNumber + '/updateScores',
+				headers: {"sessionid" : sessionStorage.sessionid},
+				data: $scope.selectedRound.places
+			}).success(function (data, status, headers, config) {
+				setSession(headers('sessionid'), $location);
+				console.log("session id from storage: " + sessionStorage.sessionid);
+				document.getElementById("successUpdateMessage").hidden = false;
+				$timeout(function(){document.getElementById("successUpdateMessage").hidden = true}, 3000);  
+			}).error(function (data, status, headers, config) {
+				// called asynchronously if an error occurs
+				// or server returns response with an error status.
+				console.log("update scores status: " + status);
+				setSession(headers('sessionid'), $location);
+				console.log("session id from storage: " + sessionStorage.sessionid);
+				clearSession();
+				$scope.$emit('Logout', $scope.user);
+				$location.path('/login');
+		});
+	}
+
+	$scope.updateScoreValues = function()
+	{
+		for(var i = 0; i < $scope.selectedRound.places.length; i++)
+		{
+			$scope.selectedRound.places[i].place = i + 1;
+		}
+	}
+
+	//$scope.dataDropped = function(event, ui)
+	//{
+	//	updatePlacesInScoring($scope);
+	//}
+
+	//$scope.deactivate = function(event, ui)
+	//{
+	//	updatePlacesInScoring($scope);
+	//}
+});
+
+function updatePlacesInScoring($scope)
+{
+	
+}
+
+function setSession(sessionid, $location)
+{
+	sessionStorage.sessionid = sessionid;
+	console.log("Session set successful!!");
+}
+
+function clearSession()
+{
+	sessionStorage.clear();
+}
+
+function isUserLoggedIn($scope, $http)
+{
+	console.log("checking sessionid: " + sessionStorage.sessionid);
+		$http({
+			method: 'GET',
+			url: 'http://users.omegasixcloud.net/accounts/user',
+			headers : {
+				'sessionid' : sessionStorage.sessionid
+			}
+		}).success(function (data, status, headers, config) {
+			console.log("get user successful");
+			sessionStorage.sessionid = headers("sessionid");
+		})
+		.error(function(data, status, headers, config) {
+			// called asynchronously if an error occurs
+			// or server returns response with an error status.
+			console.log("user not logged in!");
+			clearSession();
+			$scope.$emit('Logout', $scope.user);
+		 });
+}
+
 function updateGames($scope, $http)
 {
 	$http({
@@ -307,6 +614,19 @@ function comparePeople(person1, person2)
 		return -1;
 	}
 	if(person1.personName > person2.personName)
+	{
+		return 1;
+	}
+	return 0;
+}
+
+function comparePlaces(place1, place2)
+{
+	if(place1.place < place2.place)
+	{
+		return -1;
+	}
+	if(place1.place > place2.place)
 	{
 		return 1;
 	}

@@ -1,0 +1,43 @@
+<div class="container-fluid">
+   <div class="row">
+      <br/>
+      <br/>
+   </div>
+   <div class="row">
+      <div class="col-lg-4">
+         <div class="well bs-component">
+            <h3>
+               <center>Login</center>
+            </h3>
+            <div class="well bs-component">
+              <form class="form-horizontal">
+                <fieldset>
+                  <div class="form-group">
+                    <label for="username" class="col-lg-2 control-label">username</label>
+                    <div class="col-lg-10">
+                      <input type="text" class="form-control" id="usernameField" ng-model="user.username" placeholder="username">
+                    </div>
+                  </div>
+				  <div class="form-group">
+                    <label for="password" class="col-lg-2 control-label">password</label>
+                    <div class="col-lg-10">
+                      <input type="password" class="form-control" id="passwordField" ng-model="user.password" placeholder="password">
+                    </div>
+                  </div>
+				  <div class="form-group">
+                    <div class="col-lg-10 col-lg-offset-2">
+                      <button type="submit" class="btn btn-primary" ng-click="onLogin()">Login</button>
+                    </div>
+                  </div>
+				  <div class="form-group">
+                    <div class="col-lg-10 col-lg-offset-2">
+                      <button type="submit" class="btn btn-primary" ng-click="onAccountCreation()">Create User</button>
+                    </div>
+                  </div>
+                </fieldset>
+              </form>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
