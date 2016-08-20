@@ -1,4 +1,4 @@
-lanoelApp.controller('GameController', function($scope, $http, $routeParams) {
+lanoelApp.controller('GameController', ['$scope','$http','$routeParams','$sce', function($scope, $http, $routeParams, $sce) {
 	$scope.selectedGame = null;
 
 	$scope.$on('UpdateGames', function(event, value){
@@ -9,14 +9,23 @@ lanoelApp.controller('GameController', function($scope, $http, $routeParams) {
 		$scope.topFiveGames = value;
 	});
 
+	$scope.renderHtml = function(html_code)
+	{
+	    return $sce.trustAsHtml(html_code);
+	};
+
 	$http({
 			method: 'GET',
-			url: 'http://lanoel.elasticbeanstalk.com/lanoel/game/' + $routeParams.gameKey ,
+			url: 'http://lanoel.elasticbeanstalk.com/lanoel/game/' + $routeParams.gameKey + '/ownership',
 			data: { }
 		}).success(function (result) {
-			console.log("After get game result: " + JSON.stringify(result));
-			$scope.selectedGame = result;
-			console.log("After get game $scope.selectedGame: " + JSON.stringify($scope.selectedGame));
+			console.log("After get ownership result: " + JSON.stringify(result));
+
+			$scope.selectedGame = result.game;
+			$scope.selectedGame.steamInfo.about_the_game = $sce.trustAsHtml($scope.selectedGame.steamInfo.about_the_game);
+
+			$scope.owners = result.owners;
+			$scope.nonowners = result.nonOwners;
 	});
 
 	$scope.updateGame = function()
@@ -28,5 +37,5 @@ lanoelApp.controller('GameController', function($scope, $http, $routeParams) {
 			}).success(function (result) {
 			$scope.selectedGame = result;
 		});
-	}
-});
+	};
+}]);
