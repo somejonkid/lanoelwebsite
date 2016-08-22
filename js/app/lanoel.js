@@ -77,7 +77,7 @@ function isUserLoggedIn($scope, $http)
 	console.log("checking sessionid: " + sessionStorage.sessionid);
 		$http({
 			method: 'GET',
-			url: 'http://users.omegasixcloud.net/accounts/user',
+			url: 'http://accounts.omegasixcloud.net/accounts/user',
 			headers : {
 				'sessionid' : sessionStorage.sessionid
 			}
@@ -150,9 +150,13 @@ function vote($http, personKey, myVote)
 	$http({
 			method: 'POST',
 			url: 'http://lanoel.elasticbeanstalk.com/lanoel/person/' + personKey + '/vote',
-			data: myVote
+			data: myVote,
+			headers : {
+				'sessionid' : sessionStorage.sessionid
+			}
 		}).success(function (result) {
-		return true;
+			sessionStorage.sessionid = headers("sessionid");
+			return true;
 	});
 }
 

@@ -92,10 +92,10 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 
 	$http({
 			method: 'GET',
-			url: 'http://api.steampowered.com/ISteamApps/GetAppList/v0001/',
+			url: 'http://lanoel.elasticbeanstalk.com/lanoel/steamgames',
 			data: { }
 		}).success(function (result) {
-		$scope.fullSteamGameList = result.applist.apps.app;
+		$scope.fullSteamGameList = result;
 	});
 
 	$scope.updateVotes = function(vote1, vote2, vote3)
