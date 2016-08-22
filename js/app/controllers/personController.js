@@ -90,6 +90,14 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 		$scope.selectedPerson = result;
 	});
 
+	$http({
+			method: 'GET',
+			url: 'http://api.steampowered.com/ISteamApps/GetAppList/v0001/',
+			data: { }
+		}).success(function (result) {
+		$scope.fullSteamGameList = result.applist.apps.app;
+	});
+
 	$scope.updateVotes = function(vote1, vote2, vote3)
 	{
 		console.log("vote1: " + vote1);
