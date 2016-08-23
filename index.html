@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>LANOEL2015!</title>
+    <title>LANOEL2016!</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -41,7 +41,7 @@
     <nav class="navbar navbar-default navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
-          <a href="/" class="navbar-brand">LANoel 2015</a>
+          <a href="/" class="navbar-brand">LANoel 2016</a>
         </div>
         <div class="navbar-collapse collapse" id="navbar-main">
           <ul class="nav navbar-nav">
@@ -50,14 +50,6 @@
               <ul style="overflow-y:auto; max-height:600px" class="dropdown-menu" aria-labelledby="themes">
 				<li ng-repeat="game in games">
 					<a href="/game/{{game.gameKey}}"><img src="{{game.steamInfo.header_image}}" width="250" height="80" /></a>
-				</li>
-              </ul>
-            </li>
-			<li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" href="" id="themes">Players<span class="caret"></span></a>
-              <ul class="dropdown-menu" aria-labelledby="themes">
-				<li ng-repeat="person in people">
-					<a href="/person/{{person.personKey}}">{{ person.title }} {{ person.personName }}</a>
 				</li>
               </ul>
             </li>

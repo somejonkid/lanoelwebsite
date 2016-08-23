@@ -37,14 +37,8 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		document.getElementById("updateScoresLink").hidden = true;
 		document.getElementById("logoutLink").hidden = true;
 		document.getElementById("loginLink").hidden = false;
-		$location.path('/' + person.personKey);
+		$location.path('/');
 	});
-
-	$scope.addNewGame = function(name)
-	{
-		addGame($scope, $http, name);
-		$scope.newGameName = null;
-	};
 
 	$scope.tableNavigateToPerson = function(person)
 	{

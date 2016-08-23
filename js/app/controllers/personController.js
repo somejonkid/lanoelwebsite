@@ -82,13 +82,7 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 		$scope.topFiveGames = value;
 	});
 
-	$http({
-			method: 'GET',
-			url: 'http://lanoel.elasticbeanstalk.com/lanoel/person/' + $routeParams.personKey ,
-			data: { }
-		}).success(function (result) {
-		$scope.selectedPerson = result;
-	});
+	getPerson($scope, $http, $routeParams.personKey);
 
 	$http({
 			method: 'GET',
@@ -97,6 +91,12 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 		}).success(function (result) {
 		$scope.fullSteamGameList = result;
 	});
+
+	$scope.addNewGame = function(name)
+	{
+		addGame($scope, $http, name, $routeParams.personKey);
+		$scope.newGameName = null;
+	};
 
 	$scope.updateVotes = function(vote1, vote2, vote3)
 	{
@@ -138,3 +138,41 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 		});
 	};
 });
+
+function vote($http, personKey, myVote)
+{
+	$http({
+			method: 'POST',
+			url: 'http://lanoel.elasticbeanstalk.com/lanoel/person/' + personKey + '/vote',
+			data: myVote,
+			headers : {
+				'sessionid' : sessionStorage.sessionid
+			}
+		}).success(function (result) {
+			sessionStorage.sessionid = headers("sessionid");
+			return true;
+	});
+}
+
+function addGame($scope, $http, gameName, personKey)
+{
+	$http({
+			method: 'POST',
+			url: 'http://lanoel.elasticbeanstalk.com/lanoel/game',
+			data: {"gameName" : gameName}
+		}).then(function (result) {
+			updateGames($scope, $http);
+			getPerson($scope, $http, personKey);
+	});
+}
+
+function getPerson($scope,$http,personKey)
+{
+	$http({
+			method: 'GET',
+			url: 'http://lanoel.elasticbeanstalk.com/lanoel/person/' + personKey ,
+			data: { }
+		}).success(function (result) {
+		$scope.selectedPerson = result;
+	});
+}

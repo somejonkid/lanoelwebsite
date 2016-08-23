@@ -145,32 +145,6 @@ function updatePerson($scope, $http, $routeParams)
 	});
 }
 
-function vote($http, personKey, myVote)
-{
-	$http({
-			method: 'POST',
-			url: 'http://lanoel.elasticbeanstalk.com/lanoel/person/' + personKey + '/vote',
-			data: myVote,
-			headers : {
-				'sessionid' : sessionStorage.sessionid
-			}
-		}).success(function (result) {
-			sessionStorage.sessionid = headers("sessionid");
-			return true;
-	});
-}
-
-function addGame($scope, $http, gameName)
-{
-	$http({
-			method: 'POST',
-			url: 'http://lanoel.elasticbeanstalk.com/lanoel/game',
-			data: {"gameName" : gameName}
-		}).then(function (result) {
-			updateGames($scope, $http);
-	});
-}
-
 function compareGames(game1, game2)
 {
 	if(game1.voteTotal > game2.voteTotal)

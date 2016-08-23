@@ -7,11 +7,6 @@
                 <div class="col-lg-4">
                 </div>
                 <div class="col-lg-4">
-                  <form class="navbar-form navbar-left" style="padding-top:1%" role="search">
-            			<div class="form-group">
-            			  <input type="text" class="form-control" ng-model="newGameName" placeholder="Game Name">
-            			</div>
-            		  </form>
                 </div>
           </div>
         </div>
@@ -21,7 +16,9 @@
             <div class="well bs-component">
               <h4>Add New Games</h4>
                 <input type="text" ng-model="newGameName" uib-typeahead="game.name for game in fullSteamGameList | filter:$viewValue | limitTo:8" class="form-control">
-                <button type="submit" class="btn btn-default" ng-click="addNewGame(newGameName)">Add New Game</button>
+                <br/>
+                <button type="submit" class="btn btn-warning" ng-click="addNewGame(newGameName)">Add New Game</button>
+                <br/>
               <h4 style="text-align:center">Vote for the games you want to play</h4>
               <form class="form-horizontal">
                 <fieldset>
