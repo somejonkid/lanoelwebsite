@@ -25,6 +25,7 @@
 	<script src="js/angular-animate.min.js"></script>
 	<script src="js/angular-route.min.js"></script>
 	<script src="js/angular-dragdrop.min.js"></script>
+  <script src="js/ui-bootstrap-tpls-2.1.2.min.js"></script>
 
     <!-- Include all compiled plugins (below), or include individual files as needed -->
 
@@ -46,9 +47,9 @@
           <ul class="nav navbar-nav">
             <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="" id="themes">Games<span class="caret"></span></a>
-              <ul class="dropdown-menu" aria-labelledby="themes">
+              <ul style="overflow-y:auto; max-height:600px" class="dropdown-menu" aria-labelledby="themes">
 				<li ng-repeat="game in games">
-					<a href="/game/{{game.gameKey}}"><img src="{{game.steamInfo.header_image}}" width="200" height="40" /></a>
+					<a href="/game/{{game.gameKey}}"><img src="{{game.steamInfo.header_image}}" width="250" height="80" /></a>
 				</li>
               </ul>
             </li>

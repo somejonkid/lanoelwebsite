@@ -1,4 +1,4 @@
-var lanoelApp = angular.module('lanoel', ['ngRoute', 'ngAnimate', 'ngDragDrop']);
+var lanoelApp = angular.module('lanoel', ['ngRoute', 'ngAnimate', 'ngDragDrop','ui.bootstrap']);
 
 
 lanoelApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
