@@ -22,7 +22,15 @@ lanoelApp.controller('GameController', ['$scope','$http','$routeParams','$sce', 
 			console.log("After get ownership result: " + JSON.stringify(result));
 
 			$scope.selectedGame = result.game;
-			$scope.selectedGame.steamInfo.about_the_game = $sce.trustAsHtml($scope.selectedGame.steamInfo.about_the_game);
+			checkSteamImage($scope.selectedGame);
+			if($scope.selectedGame.steamInfo.about_the_game == null)
+			{
+				$scope.selectedGame.steamInfo.about_the_game = $sce.trustAsHtml("<h2>I am only your memory.  I can give you no new information.</h2>");
+			}
+			else
+			{
+				$scope.selectedGame.steamInfo.about_the_game = $sce.trustAsHtml($scope.selectedGame.steamInfo.about_the_game);
+			}
 
 			$scope.owners = result.owners;
 			$scope.nonowners = result.nonOwners;

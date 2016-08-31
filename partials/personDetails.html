@@ -15,7 +15,7 @@
           <div class="col-lg-6">
             <div class="well bs-component">
               <h4>Add New Games</h4>
-                <input type="text" ng-model="newGameName" uib-typeahead="game.name for game in fullSteamGameList | filter:$viewValue | limitTo:8" class="form-control">
+                <input type="text" ng-model="newGameName" uib-typeahead="game.name for game in fullSteamGameList | filter:$viewValue | limitTo:15" class="form-control">
                 <br/>
                 <button type="submit" class="btn btn-warning" ng-click="addNewGame(newGameName)">Add New Game</button>
                 <br/>

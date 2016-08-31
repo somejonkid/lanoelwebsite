@@ -1,6 +1,5 @@
 var lanoelApp = angular.module('lanoel', ['ngRoute', 'ngAnimate', 'ngDragDrop','ui.bootstrap']);
 
-
 lanoelApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
 	$routeProvider
 
@@ -12,23 +11,23 @@ lanoelApp.config(['$routeProvider', '$locationProvider', function($routeProvider
 
 		// route for the about page
 		.when('/game/:gameKey', {
-			templateUrl : '/partials/gameDetails.html',
+			templateUrl : '/game/gameDetails.html',
 			controller  : 'GameController'
 		})
 
 		// route for the contact page
 		.when('/person/:personKey', {
-			templateUrl : '/partials/personDetails.html',
+			templateUrl : '/person/personDetails.html',
 			controller  : 'PersonController'
 		})
 
 		.when('/tournament', {
-			templateUrl : '/partials/tournament.html',
+			templateUrl : '/tournament/tournament.html',
 			controller  : 'TournamentController'
 		})
 
 		.when('/login', {
-			templateUrl : '/partials/login.html',
+			templateUrl : '/login/login.html',
 			controller  : 'LoginController'
 		})
 
@@ -77,7 +76,7 @@ function isUserLoggedIn($scope, $http)
 	console.log("checking sessionid: " + sessionStorage.sessionid);
 		$http({
 			method: 'GET',
-			url: 'http://accounts.omegasixcloud.net/accounts/user',
+			url: 'https://accounts.omegasixcloud.net/accounts/user',
 			headers : {
 				'sessionid' : sessionStorage.sessionid
 			}
@@ -103,6 +102,7 @@ function updateGames($scope, $http)
 		}).success(function (result) {
 			console.log("After updateGames, result: " + JSON.stringify(result));
 			$scope.games = result.sort(compareGames);
+			$scope.games.forEach(checkSteamImage);
 			$scope.$emit('UpdateGames', $scope.games);
 	});
 
@@ -115,6 +115,15 @@ function updateGames($scope, $http)
 			$scope.topFiveGames = result;
 			$scope.$emit('UpdateTopFiveGames', $scope.topFiveGames);
 	});
+}
+
+function checkSteamImage(game)
+{
+	if(game.steamInfo == null)
+	{
+		game.steamInfo = {};
+		game.steamInfo.header_image = 'http://dummyimage.com/600x400/000/fff&text=' + game.gameName;
+	}
 }
 
 function updatePeople($scope, $http)
