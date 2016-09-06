@@ -61,11 +61,14 @@
             </li>
           </ul>
 		  <ul class="nav navbar-nav navbar-right" id="accountList">
-			<li ng-show="!isUserLoggedIn()" id="loginLink"><a ng-click="loginClick()" >Login</a></li>
-			<li ng-show="isUserLoggedIn()"id="logoutLink"><a ng-click="logoutClick()" >Logout</a></li>
-			<li ng-show="isUserLoggedIn()"id="updateScoresLink">
+			<li ng-show="!checkUserLogin()" id="loginLink"><a ng-click="loginClick()" >Login</a></li>
+			<li ng-show="checkUserLogin()"id="logoutLink"><a ng-click="logoutClick()" >Logout</a></li>
+			<li ng-show="checkUserLogin()"id="updateScoresLink">
               <a ng-click="updateScoresClick()">Update Scores</a>
-            </li>
+      </li>
+      <li ng-show="checkUserLogin()"id="myAccountLink">
+              <a ng-click="getMyAccount()">My Account</a>
+      </li>
 		  </ul>
         </div>
       </div>

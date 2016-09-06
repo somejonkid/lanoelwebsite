@@ -60,39 +60,6 @@ function updatePlacesInScoring($scope)
 
 }
 
-function setSession(sessionid, $location)
-{
-	sessionStorage.sessionid = sessionid;
-	console.log("Session set successful!!");
-}
-
-function clearSession()
-{
-	sessionStorage.clear();
-}
-
-function isUserLoggedIn($scope, $http)
-{
-	console.log("checking sessionid: " + sessionStorage.sessionid);
-		$http({
-			method: 'GET',
-			url: 'https://accounts.omegasixcloud.net/accounts/user',
-			headers : {
-				'sessionid' : sessionStorage.sessionid
-			}
-		}).success(function (data, status, headers, config) {
-			console.log("get user successful");
-			sessionStorage.sessionid = headers("sessionid");
-		})
-		.error(function(data, status, headers, config) {
-			// called asynchronously if an error occurs
-			// or server returns response with an error status.
-			console.log("user not logged in!");
-			clearSession();
-			$scope.$emit('Logout', $scope.user);
-		 });
-}
-
 function updateGames($scope, $http)
 {
 	$http({
@@ -135,6 +102,7 @@ function updatePeople($scope, $http)
 		}).success(function (result) {
 			console.log("After updatePeople, result: " + JSON.stringify(result));
 			$scope.people = result.sort(comparePeople);
+			sessionStorage.personCache = JSON.stringify(result);
 			$scope.$emit('UpdatePeople', result);
 	});
 }

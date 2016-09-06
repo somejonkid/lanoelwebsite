@@ -23,7 +23,7 @@ lanoelApp.controller('LoginController', function($scope, $http, $routeParams, $l
 			}
 		}).success(function (data, status, headers, config) {
 			console.log("sessionid: " + headers("sessionid"));
-			setSession(headers("sessionid"), $location);
+			setSession(headers("sessionid"), $scope.user.username);
 			$scope.$emit('Login', $scope.user);
 			$location.path('/');
 			console.log("session id from storage: " + sessionStorage.sessionid);
@@ -44,3 +44,10 @@ lanoelApp.controller('LoginController', function($scope, $http, $routeParams, $l
 		$location.path('/createAccount');
 	}
 });
+
+function setSession(sessionid, user)
+{
+	sessionStorage.sessionid = sessionid;
+	sessionStorage.userName = user;
+	console.log("Session set successful!!");
+}

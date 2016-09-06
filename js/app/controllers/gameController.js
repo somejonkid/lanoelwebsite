@@ -25,7 +25,7 @@ lanoelApp.controller('GameController', ['$scope','$http','$routeParams','$sce', 
 			checkSteamImage($scope.selectedGame);
 			if($scope.selectedGame.steamInfo.about_the_game == null)
 			{
-				$scope.selectedGame.steamInfo.about_the_game = $sce.trustAsHtml("<h2>I am only your memory.  I can give you no new information.</h2>");
+				$scope.selectedGame.steamInfo.about_the_game = $sce.trustAsHtml("<h2>I am only your memory.  I can give you no new information.</h2><br/><h3>This game is not on steam, or you typed the name wrong...</h3>");
 			}
 			else
 			{
