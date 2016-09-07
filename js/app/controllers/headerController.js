@@ -66,6 +66,10 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		{
 			$scope.$emit('Logout', $scope.user);
 		}
+		if(sessionStorage.personCache === undefined)
+		{
+			updatePeople($scope, $http);
+		}
 		$location.path('person/' + $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0].personKey);
 	}
 
@@ -97,19 +101,17 @@ function isSessionValid($scope, $http)
 			// called asynchronously if an error occurs
 			// or server returns response with an error status.
 			console.log("user not logged in!");
-			if(sessionStorage.sessionId != null)
-			{
-				clearSession();
-				$scope.$emit('Logout', $scope.user);
-			}
-
+			clearSession();
+			$scope.$emit('Logout', $scope.user);
 			return false;
 		 });
 };
 
 function clearSession()
 {
+	var tempCache = sessionStorage.personCache;
 	sessionStorage.clear();
+	sessionStorage.personCache = tempCache;
 };
 
 function logoutHandler()
