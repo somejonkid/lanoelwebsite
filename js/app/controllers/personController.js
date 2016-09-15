@@ -1,5 +1,5 @@
 lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $filter) {
-	$scope.selectedPerson = null;
+	$scope.selectedPerson = $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0];
 	$scope.games = [];
 	$scope.topFiveGames = [];
 
