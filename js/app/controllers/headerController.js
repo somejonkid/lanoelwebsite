@@ -27,7 +27,6 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 	});
 
 	$scope.$on('Login', function(event, value){
-		console.log("entering login event handler");
 		document.getElementById("updateScoresLink").hidden = false;
 		document.getElementById("logoutLink").hidden = false;
 	});
@@ -44,13 +43,11 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 
 	$scope.loginClick = function()
 	{
-		console.log("sessionstorage sessionid: " + sessionStorage.sessionid);
 		$location.path('/login');
 	}
 
 	$scope.logoutClick = function()
 	{
-		console.log("logging out");
 		clearSession();
 		$location.path('/');
 	}
@@ -85,7 +82,6 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 
 function isSessionValid($scope, $http)
 {
-	console.log("checking sessionid: " + sessionStorage.sessionid);
 		$http({
 			method: 'GET',
 			url: 'https://accounts.omegasixcloud.net/accounts/user',
@@ -93,14 +89,12 @@ function isSessionValid($scope, $http)
 				'sessionid' : sessionStorage.sessionid
 			}
 		}).success(function (data, status, headers, config) {
-			console.log("get user successful");
 			sessionStorage.sessionid = headers("sessionid");
 			return true;
 		})
 		.error(function(data, status, headers, config) {
 			// called asynchronously if an error occurs
 			// or server returns response with an error status.
-			console.log("user not logged in!");
 			clearSession();
 			$scope.$emit('Logout', $scope.user);
 			return false;
@@ -116,7 +110,6 @@ function clearSession()
 
 function logoutHandler()
 {
-	console.log("entering logout event handler");
   document.getElementById("updateScoresLink").hidden = true;
   document.getElementById("logoutLink").hidden = true;
   document.getElementById("loginLink").hidden = false;

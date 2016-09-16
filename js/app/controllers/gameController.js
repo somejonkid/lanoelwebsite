@@ -19,7 +19,6 @@ lanoelApp.controller('GameController', ['$scope','$http','$routeParams','$sce', 
 			url: 'http://lanoel.elasticbeanstalk.com/lanoel/game/' + $routeParams.gameKey + '/ownership',
 			data: { }
 		}).success(function (result) {
-			console.log("After get ownership result: " + JSON.stringify(result));
 
 			$scope.selectedGame = result.game;
 			checkSteamImage($scope.selectedGame);

@@ -22,13 +22,11 @@ lanoelApp.controller('UpdateScoresController', function($scope, $http, $routePar
     $scope.onTabClick = function(round)
 	{
 		$scope.selectedRound = round;
-		console.log("On click, current round: " + $scope.selectedRound.game.gameName);
 	}
 
 	$scope.onSubmit = function()
 	{
 		$scope.updateScoreValues();
-		console.log("selected round places: " + $scope.selectedRound.places);
 		$scope.postUpdateScore();
 	}
 
@@ -41,15 +39,12 @@ lanoelApp.controller('UpdateScoresController', function($scope, $http, $routePar
 				data: $scope.selectedRound.places
 			}).success(function (data, status, headers, config) {
 				setSession(headers('sessionid'), $location);
-				console.log("session id from storage: " + sessionStorage.sessionid);
 				document.getElementById("successUpdateMessage").hidden = false;
 				$timeout(function(){document.getElementById("successUpdateMessage").hidden = true}, 3000);
 			}).error(function (data, status, headers, config) {
 				// called asynchronously if an error occurs
 				// or server returns response with an error status.
-				console.log("update scores status: " + status);
 				setSession(headers('sessionid'), $location);
-				console.log("session id from storage: " + sessionStorage.sessionid);
 				clearSession();
 				$scope.$emit('Logout', $scope.user);
 				$location.path('/login');

@@ -27,6 +27,7 @@
                     <div class="col-lg-10">
                       <select class="form-control" ng-model="gameVote1selection" ng-change="onGameVote1Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
                       </select>
+                      <img src="../images/checkmark.png" style="width:10px;height:10px;" ng-show="gameVote1Success"/>
                       <br>
                     </div>
                   </div>
@@ -35,6 +36,7 @@
                     <div class="col-lg-10">
                       <select class="form-control" ng-model="gameVote2selection" ng-change="onGameVote2Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
                       </select>
+                      <img src="../images/checkmark.png" style="width:10px;height:10px;" ng-show="gameVote2Success"/>
                       <br>
                     </div>
                   </div>
@@ -43,6 +45,7 @@
                     <div class="col-lg-10">
                       <select class="form-control" ng-model="gameVote3selection" ng-change="onGameVote3Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
                       </select>
+                      <img src="../images/checkmark.png" style="width:10px;height:10px;" ng-show="gameVote3Success"/>
                       <br>
                     </div>
                   </div>

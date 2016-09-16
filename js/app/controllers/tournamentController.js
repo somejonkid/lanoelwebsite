@@ -37,6 +37,5 @@ lanoelApp.controller('TournamentController', function($scope, $http, $routeParam
     $scope.onTabClick = function(round)
 	{
 		$scope.selectedRound = round;
-		console.log("On click, current round: " + $scope.selectedRound.game.gameName);
 	}
 });

@@ -67,7 +67,6 @@ function updateGames($scope, $http)
 			url: 'http://lanoel.elasticbeanstalk.com/lanoel/gamelist',
 			data: { }
 		}).success(function (result) {
-			console.log("After updateGames, result: " + JSON.stringify(result));
 			$scope.games = result.sort(compareGames);
 			$scope.games.forEach(checkSteamImage);
 			$scope.$emit('UpdateGames', $scope.games);
@@ -78,7 +77,6 @@ function updateGames($scope, $http)
 			url: 'http://lanoel.elasticbeanstalk.com/lanoel/topfivegames',
 			data: { }
 		}).success(function (result) {
-			console.log("After Top Five Games, result: " + JSON.stringify(result));
 			$scope.topFiveGames = result;
 			$scope.$emit('UpdateTopFiveGames', $scope.topFiveGames);
 	});
@@ -100,7 +98,6 @@ function updatePeople($scope, $http)
 			url: 'http://lanoel.elasticbeanstalk.com/lanoel/personlist',
 			data: { }
 		}).success(function (result) {
-			console.log("After updatePeople, result: " + JSON.stringify(result));
 			$scope.people = result.sort(comparePeople);
 			sessionStorage.personCache = JSON.stringify(result);
 			$scope.$emit('UpdatePeople', result);
@@ -115,9 +112,6 @@ function updatePerson($scope, $http, $routeParams)
 			data: { }
 		}).then(function (result) {
 		$scope.selectedPerson = result.data;
-		console.log("After get person, result: " + JSON.stringify(result));
-		console.log("After get person, selectedPerson.gameVote1: " + $scope.selectedPerson.gameVote1);
-		console.log("After get person, result.gameVote1: " + result.gameVote1);
 		$scope.$emit('UpdatePerson', $scope.selectedPerson);
 	});
 }
