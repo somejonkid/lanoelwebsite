@@ -11,23 +11,23 @@ lanoelApp.config(['$routeProvider', '$locationProvider', function($routeProvider
 
 		// route for the about page
 		.when('/game/:gameKey', {
-			templateUrl : '/game/gameDetails.html',
+			templateUrl : '/partials/gameDetails.html',
 			controller  : 'GameController'
 		})
 
 		// route for the contact page
 		.when('/person/:personKey', {
-			templateUrl : '/person/personDetails.html',
+			templateUrl : '/partials/personDetails.html',
 			controller  : 'PersonController'
 		})
 
 		.when('/tournament', {
-			templateUrl : '/tournament/tournament.html',
+			templateUrl : '/partials/tournament.html',
 			controller  : 'TournamentController'
 		})
 
 		.when('/login', {
-			templateUrl : '/login/login.html',
+			templateUrl : '/partials/login.html',
 			controller  : 'LoginController'
 		})
 

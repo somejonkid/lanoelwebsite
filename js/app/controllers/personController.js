@@ -38,6 +38,14 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 		$scope.gameVote3selection = {gameKey : gameselectionKey3, gameName : gameselectionName3};
 	};
 
+	$scope.goVote = function(gameKey, voteNumber)
+	{
+		var myVote = {"gameKey":gameKey, "voteNumber":voteNumber}
+		vote($http, $scope.selectedPerson.personKey, myVote, $scope);
+		//updatePeople($scope, $http);
+		updateGames($scope, $http);
+	};
+
 	$scope.$on('UpdatePeople', function(event, value){
 		$scope.selectedPerson = $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0];
 		$scope.setVoteFields();
@@ -45,7 +53,7 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 
 	$scope.$on('UpdateGames', function(event, value){
 		$scope.games = value;
-		$scope.setVoteFields();
+		//$scope.setVoteFields();
 	});
 
 	$scope.$on('UpdateTopFiveGames', function(event, value){
@@ -58,6 +66,7 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 		var gameselectionObj1 = $filter('filter')($scope.games, {gameKey : $scope.gameVote1selection}, true)[0];
 		console.log("after filter: " + JSON.stringify(gameselectionObj1));
 		$scope.gameVote1selection = {gameKey : gameselectionObj1.gameKey, gameName : gameselectionObj1.gameName};
+		$scope.goVote($scope.gameVote1selection.gameKey, 3);
 	}
 
 	$scope.onGameVote2Change = function()
@@ -66,6 +75,7 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 		var gameselectionObj2 = $filter('filter')($scope.games, {gameKey : $scope.gameVote2selection}, true)[0];
 		console.log("after filter: " + JSON.stringify(gameselectionObj2));
 		$scope.gameVote2selection = {gameKey : gameselectionObj2.gameKey, gameName : gameselectionObj2.gameName};
+		$scope.goVote($scope.gameVote2selection.gameKey, 2);
 	}
 
 	$scope.onGameVote3Change = function()
@@ -74,9 +84,11 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 		var gameselectionObj3 = $filter('filter')($scope.games, {gameKey : $scope.gameVote3selection}, true)[0];
 		console.log("after filter: " + JSON.stringify(gameselectionObj3));
 		$scope.gameVote3selection = {gameKey : gameselectionObj3.gameKey, gameName : gameselectionObj3.gameName};
+		$scope.goVote($scope.gameVote3selection.gameKey, 1);
 	}
 
 	updateGames($scope, $http, $scope.updateVotes);
+	updatePeople($scope, $http);
 
 	$http({
 			method: 'GET',
@@ -91,47 +103,6 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 		addGame($scope, $http, name, $routeParams.personKey);
 		$scope.newGameName = null;
 	};
-
-	$scope.updateVotes = function(vote1, vote2, vote3)
-	{
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		console.log("vote1: " + vote1);
-		console.log("vote2: " + vote2);
-		console.log("vote3: " + vote3);
-
-		console.log("games: " + $scope.games);
-
-		var myVote1 = {"gameKey":vote1.gameKey, "voteNumber":3}
-		var myVote2 = {"gameKey":vote2.gameKey, "voteNumber":2}
-		var myVote3 = {"gameKey":vote3.gameKey, "voteNumber":1}
-
-		console.log("myVote1: " + JSON.stringify(myVote1));
-		console.log("myVote2: " + JSON.stringify(myVote2));
-		console.log("myVote3: " + JSON.stringify(myVote3));
-
-		if(myVote1.gameKey != null)
-		{
-			vote($http, $scope.selectedPerson.personKey, myVote1, $scope);
-		}
-		if(myVote2.gameKey != null)
-		{
-			vote($http, $scope.selectedPerson.personKey, myVote2, $scope);
-		}
-		if(myVote3.gameKey != null)
-		{
-			vote($http, $scope.selectedPerson.personKey, myVote3, $scope);
-		}
-		updatePeople($scope, $http);
-		updateGames($scope, $http);
-		alert("Place Holder!");
-	};
 });
 
 function vote($http, personKey, myVote, $scope)
@@ -143,10 +114,10 @@ function vote($http, personKey, myVote, $scope)
 			headers : {
 				'sessionid' : sessionStorage.sessionid
 			}
-		}).success(function (result) {
-			sessionStorage.sessionid = headers("sessionid");
+		}).then(function (result) {
+			sessionStorage.sessionid = result.headers("sessionid");
 			return true;
-	});
+		});
 }
 
 function addGame($scope, $http, gameName, personKey)
