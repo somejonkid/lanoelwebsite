@@ -6,7 +6,7 @@ lanoelApp.config(['$routeProvider', '$locationProvider', function($routeProvider
 		// route for the home page
 		.when('/', {
 			templateUrl : '/partials/home.html',
-			controller  : 'MainController'
+			controller  : 'HeaderController'
 		})
 
 		// route for the about page
