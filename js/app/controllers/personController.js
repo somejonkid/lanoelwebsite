@@ -8,6 +8,12 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	$scope.gameVote2Success = false;
 	$scope.gameVote3Success = false;
 
+	$scope.defaultBgColor = {"background-color" : "white"};
+	$scope.successBgColor = {"background-color" : "#9ACD32"};
+	$scope.vote1Background = $scope.defaultBgColor;
+	$scope.vote2Background = $scope.defaultBgColor;
+	$scope.vote3Background = $scope.defaultBgColor;
+
 	$scope.setVoteFields = function()
 	{
 		var gameselectionObj1 = $filter('filter')($scope.games, {gameName : $scope.selectedPerson.gameVote3}, true)[0];
@@ -63,14 +69,30 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	});
 
 	$scope.$on('UpdateVote', function(event, value){
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		$scope.gameVote1Success = true;
+		
+		var successBgColor = {}
+		if(value == 3)
+		{
+			$scope.gameVote1Success = true;
+			$scope.vote1Background = $scope.successBgColor;
+		}
+		if(value == 2)
+		{
+			$scope.gameVote2Success = true;
+			$scope.vote2Background = $scope.successBgColor;
+		}
+		if(value == 1)
+		{
+			$scope.gameVote3Success = true;
+			$scope.vote3Background = $scope.successBgColor;
+		}
 		$timeout(function(){
 			$scope.gameVote1Success = false;
+			$scope.gameVote2Success = false;
+			$scope.gameVote3Success = false;
+			$scope.vote1Background = $scope.defaultBgColor;
+			$scope.vote2Background = $scope.defaultBgColor;
+			$scope.vote3Background = $scope.defaultBgColor;
 		}, 2000);
 		updateGames($scope, $http);
 	});
@@ -126,7 +148,7 @@ function vote($http, personKey, myVote, $scope)
 			}
 		}).then(function (result) {
 			sessionStorage.sessionid = result.headers("sessionid");
-			$scope.$emit('UpdateVote', $scope);
+			$scope.$emit('UpdateVote', myVote.voteNumber);
 		});
 }
 
