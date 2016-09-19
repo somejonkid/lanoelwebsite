@@ -1,4 +1,4 @@
-lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeParams, $location, $filter) {
+lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeParams, $location, $filter, $sce) {
 	$scope.$route = $route;
     $scope.$location = $location;
     $scope.$routeParams = $routeParams;
@@ -78,6 +78,17 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		}
 		return true;
 	}
+
+	$scope.gameImageForTable = function(inputGame)
+	{
+		if(inputGame == null)
+		{
+			return "http://dummyimage.com/150x50/000/fff&text=Circle%20Jerk";
+		}
+		var game = $filter('filter')($scope.games, {gameName : inputGame}, true)[0];
+		if(game == undefined) return;
+		return game.steamInfo.header_image;
+	};
 });
 
 function isSessionValid($scope, $http)

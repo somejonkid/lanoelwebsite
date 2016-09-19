@@ -24,9 +24,9 @@
 			  <tbody>
 				<tr ng-repeat="person in people">
 				  <td>{{ person.personName }}</td>
-				  <td>{{ person.gameVote3 }}</td>
-				  <td>{{ person.gameVote2 }}</td>
-				  <td>{{ person.gameVote1 }}</td>
+				  <td><img src="{{ gameImageForTable(person.gameVote3) }}" width="150" height="50" /></td>
+				  <td><img src="{{ gameImageForTable(person.gameVote2) }}" width="150" height="50" /></td>
+				  <td><img src="{{ gameImageForTable(person.gameVote1) }}" width="150" height="50" /></td>
 				</tr>
 			  </tbody>
 			</table>

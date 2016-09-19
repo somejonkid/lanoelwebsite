@@ -9,7 +9,7 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	$scope.gameVote3Success = false;
 
 	$scope.defaultBgColor = {"background-color" : "white"};
-	$scope.successBgColor = {"background-color" : "#9ACD32"};
+	$scope.successBgColor = {"background-color" : "#9ACD32", "transition": "background-color 500ms linear"};
 	$scope.vote1Background = $scope.defaultBgColor;
 	$scope.vote2Background = $scope.defaultBgColor;
 	$scope.vote3Background = $scope.defaultBgColor;
@@ -57,11 +57,12 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 
 	$scope.$on('UpdatePeople', function(event, value){
 		$scope.selectedPerson = $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0];
-		$scope.setVoteFields();
+		updateGames($scope, $http);
 	});
 
 	$scope.$on('UpdateGames', function(event, value){
 		$scope.games = value;
+		$scope.setVoteFields();
 	});
 
 	$scope.$on('UpdateTopFiveGames', function(event, value){
@@ -102,6 +103,7 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	{
 		var gameselectionObj1 = $filter('filter')($scope.games, {gameKey : $scope.gameVote1selection}, true)[0];
 		$scope.gameVote1selection = {gameKey : gameselectionObj1.gameKey, gameName : gameselectionObj1.gameName};
+		$scope.selectedPerson.gameVote3 = gameselectionObj1.gameName;
 		$scope.goVote($scope.gameVote1selection.gameKey, 3);
 	}
 
@@ -109,6 +111,7 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	{
 		var gameselectionObj2 = $filter('filter')($scope.games, {gameKey : $scope.gameVote2selection}, true)[0];
 		$scope.gameVote2selection = {gameKey : gameselectionObj2.gameKey, gameName : gameselectionObj2.gameName};
+		$scope.selectedPerson.gameVote2 = gameselectionObj2.gameName;
 		$scope.goVote($scope.gameVote2selection.gameKey, 2);
 	}
 
@@ -116,10 +119,10 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	{
 		var gameselectionObj3 = $filter('filter')($scope.games, {gameKey : $scope.gameVote3selection}, true)[0];
 		$scope.gameVote3selection = {gameKey : gameselectionObj3.gameKey, gameName : gameselectionObj3.gameName};
+		$scope.selectedPerson.gameVote1 = gameselectionObj3.gameName;
 		$scope.goVote($scope.gameVote3selection.gameKey, 1);
 	}
 
-	updateGames($scope, $http);
 	updatePeople($scope, $http);
 
 	$http({
