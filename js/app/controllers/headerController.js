@@ -41,11 +41,6 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		$location.path('/person/' + person.personKey);
 	};
 
-	$scope.loginClick = function()
-	{
-		$location.path('/login');
-	}
-
 	$scope.logoutClick = function()
 	{
 		clearSession();
@@ -89,6 +84,51 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		if(game == undefined) return;
 		return game.steamInfo.header_image;
 	};
+
+	$scope.onLogin = function()
+	{
+		$http({
+			method: 'POST',
+			url: 'https://accounts.omegasixcloud.net/accounts/login',
+			headers : {
+				'username' : $scope.user.username,
+				'password' : $scope.user.password
+			}
+		}).success(function (data, status, headers, config) {
+			$scope.user.username = null;
+			$scope.user.password = null;
+			setSession(headers("sessionid"), $scope.user.username);
+			$scope.$emit('Login', $scope.user);
+			$location.path('/');
+		})
+		.error(function(data, status, headers, config) {
+			// called asynchronously if an error occurs
+			// or server returns response with an error status.
+			$scope.user.username = null;
+			$scope.user.password = null;
+			clearSession();
+			document.getElementById("loginErrorAlert").hidden = false;
+		 });
+	}
+
+	$scope.onPasswordReset = function()
+	{
+		$http({
+			method: 'POST',
+			url: 'https://accounts.omegasixcloud.net/accounts/resetpassword',
+			headers : {
+				'email' : $scope.user.email
+			}
+		}).success(function (data, status, headers, config) {
+			$location.path('/');
+		})
+		.error(function(data, status, headers, config) {
+			// called asynchronously if an error occurs
+			// or server returns response with an error status.
+			clearSession();
+			$location.path('/');
+		 });
+	}
 });
 
 function isSessionValid($scope, $http)
