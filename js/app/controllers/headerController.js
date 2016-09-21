@@ -95,9 +95,9 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 				'password' : $scope.user.password
 			}
 		}).success(function (data, status, headers, config) {
+			setSession(headers("sessionid"), $scope.user.username);
 			$scope.user.username = null;
 			$scope.user.password = null;
-			setSession(headers("sessionid"), $scope.user.username);
 			$scope.$emit('Login', $scope.user);
 			$location.path('/');
 		})
