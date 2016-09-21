@@ -8,7 +8,7 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	$scope.gameVote2Success = false;
 	$scope.gameVote3Success = false;
 
-	$scope.defaultBgColor = {"background-color" : "white"};
+	$scope.defaultBgColor = {"background-color" : "white", "transition": "background-color 500ms linear"};
 	$scope.successBgColor = {"background-color" : "#9ACD32", "transition": "background-color 500ms linear"};
 	$scope.vote1Background = $scope.defaultBgColor;
 	$scope.vote2Background = $scope.defaultBgColor;
@@ -94,7 +94,7 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 			$scope.vote1Background = $scope.defaultBgColor;
 			$scope.vote2Background = $scope.defaultBgColor;
 			$scope.vote3Background = $scope.defaultBgColor;
-		}, 2000);
+		}, 1000);
 		updateGames($scope, $http);
 	});
 
