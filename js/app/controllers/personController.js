@@ -8,8 +8,13 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	$scope.gameVote2Success = false;
 	$scope.gameVote3Success = false;
 
+	$scope.gameVote1Error = false;
+	$scope.gameVote2Error = false;
+	$scope.gameVote3Error = false;
+
 	$scope.defaultBgColor = {"background-color" : "white", "transition": "background-color 500ms linear"};
 	$scope.successBgColor = {"background-color" : "#9ACD32", "transition": "background-color 500ms linear"};
+	$scope.errorBgColor = {"background-color" : "#CC0000", "transition": "background-color 500ms linear"};
 	$scope.vote1Background = $scope.defaultBgColor;
 	$scope.vote2Background = $scope.defaultBgColor;
 	$scope.vote3Background = $scope.defaultBgColor;
@@ -102,6 +107,18 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	$scope.onGameVote1Change = function()
 	{
 		var gameselectionObj1 = $filter('filter')($scope.games, {gameKey : $scope.gameVote1selection}, true)[0];
+		if(!validGameSelection(gameselectionObj1))
+		{
+			$scope.vote1Background = $scope.errorBgColor;
+			$scope.gameVote1Error = true;
+			$timeout(function(){
+				$scope.vote1Background = $scope.defaultBgColor;
+				$scope.gameVote1Error = false;
+				$scope.setVoteFields();
+			}, 1000);
+			return;
+		}
+		
 		$scope.gameVote1selection = {gameKey : gameselectionObj1.gameKey, gameName : gameselectionObj1.gameName};
 		$scope.selectedPerson.gameVote3 = gameselectionObj1.gameName;
 		$scope.goVote($scope.gameVote1selection.gameKey, 3);
@@ -110,6 +127,18 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	$scope.onGameVote2Change = function()
 	{
 		var gameselectionObj2 = $filter('filter')($scope.games, {gameKey : $scope.gameVote2selection}, true)[0];
+		if(!validGameSelection(gameselectionObj2))
+		{
+			$scope.gameVote2Error = true;
+			$scope.vote2Background = $scope.errorBgColor;
+			$timeout(function(){
+				$scope.vote2Background = $scope.defaultBgColor;
+				$scope.gameVote2Error = false;
+				$scope.setVoteFields();
+			}, 1000);
+			return;
+		}
+
 		$scope.gameVote2selection = {gameKey : gameselectionObj2.gameKey, gameName : gameselectionObj2.gameName};
 		$scope.selectedPerson.gameVote2 = gameselectionObj2.gameName;
 		$scope.goVote($scope.gameVote2selection.gameKey, 2);
@@ -118,6 +147,18 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	$scope.onGameVote3Change = function()
 	{
 		var gameselectionObj3 = $filter('filter')($scope.games, {gameKey : $scope.gameVote3selection}, true)[0];
+		if(!validGameSelection(gameselectionObj3))
+		{
+			$scope.gameVote3Error = true;
+			$scope.vote3Background = $scope.errorBgColor;
+			$timeout(function(){
+				$scope.vote3Background = $scope.defaultBgColor;
+				$scope.gameVote3Error = false;
+				$scope.setVoteFields();
+			}, 1000);
+			return;
+		}
+		
 		$scope.gameVote3selection = {gameKey : gameselectionObj3.gameKey, gameName : gameselectionObj3.gameName};
 		$scope.selectedPerson.gameVote1 = gameselectionObj3.gameName;
 		$scope.goVote($scope.gameVote3selection.gameKey, 1);
@@ -139,6 +180,31 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 		$scope.newGameName = null;
 	};
 });
+
+function validGameSelection(selectedGame)
+{
+	if(selectedGame == null || selectedGame.steamInfo == null || selectedGame.steamInfo.categories == null)
+	{
+		return true;
+	}
+	var hasSinglePlayer = false;
+	var hasMultiPlayer = false;
+	for(var i = 0; i < selectedGame.steamInfo.categories.length; i++)
+	{
+		var desc = selectedGame.steamInfo.categories[i].description.toUpperCase();
+		if(desc.includes("MULTI") && desc.includes("PLAYER"))
+		{
+			hasMultiPlayer = true;
+		}
+
+		if(desc.includes("SINGLE") && desc.includes("PLAYER"))
+		{
+			hasSinglePlayer = true;
+		}
+	}
+
+	return (hasSinglePlayer && !hasMultiPlayer) ? false : true;
+}
 
 function vote($http, personKey, myVote, $scope)
 {

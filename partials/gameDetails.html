@@ -2,14 +2,16 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12">
-									<div class="col-lg-4">
+                <div class="col-lg-4">
                     <img ng-src="{{selectedGame.steamInfo.header_image}}" />
-									</div>
-									<div class="col-lg-4">
-									</div>
-									<div class="col-lg-4">
-										<h1>Number of Votes: {{ selectedGame.voteTotal }}</h1>
-									</div>
+                </div>
+                <div class="col-lg-4">
+                </div>
+                <div class="col-lg-4">
+                    <h1>Number of Votes: {{ selectedGame.voteTotal }}</h1>
+                    <br/>
+                    <h3>Price on Steam: ${{selectedGame.steamInfo.price_overview.final}} </h3>
+                </div>
             </div>
         </div>
 

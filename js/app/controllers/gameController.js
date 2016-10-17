@@ -30,6 +30,7 @@ lanoelApp.controller('GameController', ['$scope','$http','$routeParams','$sce', 
 			{
 				$scope.selectedGame.steamInfo.about_the_game = $sce.trustAsHtml($scope.selectedGame.steamInfo.about_the_game);
 			}
+			$scope.selectedGame.steamInfo.price_overview.final = $scope.selectedGame.steamInfo.price_overview.final / 100; 
 
 			$scope.owners = result.owners;
 			$scope.nonowners = result.nonOwners;

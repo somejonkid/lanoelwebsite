@@ -28,6 +28,7 @@
                       <select class="form-control" ng-style="vote1Background" ng-model="gameVote1selection" ng-change="onGameVote1Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
                       </select>
                       <img src="../images/checkmark.png" style="width:10px;height:10px;" ng-show="gameVote1Success"/>
+                      <div ng-show="gameVote1Error">Cannot vote for single player games</div>
                       <br>
                     </div>
                   </div>
@@ -37,6 +38,7 @@
                       <select class="form-control" ng-style="vote2Background" ng-model="gameVote2selection" ng-change="onGameVote2Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
                       </select>
                       <img src="../images/checkmark.png" style="width:10px;height:10px;" ng-show="gameVote2Success"/>
+                      <div ng-show="gameVote2Error">Cannot vote for single player games</div>
                       <br>
                     </div>
                   </div>
@@ -46,6 +48,7 @@
                       <select class="form-control" ng-style="vote3Background" ng-model="gameVote3selection" ng-change="onGameVote3Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
                       </select>
                       <img src="../images/checkmark.png" style="width:10px;height:10px;" ng-show="gameVote3Success"/>
+                      <div ng-show="gameVote3Error">Cannot vote for single player games</div>
                       <br>
                     </div>
                   </div>
