@@ -85,27 +85,26 @@
           <h4 class="modal-title">Login</h4>
         </div>
         <div class="modal-body">
-          <form class="form-horizontal">
+          <form class="form-horizontal" ng-submit="onLogin()">
                 <fieldset>
                   <div class="form-group">
                     <label for="username" class="col-lg-2 control-label">Username</label>
                     <div class="col-lg-10">
-                      <input type="text" class="form-control" id="usernameField" ng-model="user.username" placeholder="username">
+                      <input autofocus type="text" class="form-control" id="usernameField" ng-model="user.username" placeholder="username">
                     </div>
                   </div>
-				  <div class="form-group">
+				          <div class="form-group">
                     <label for="password" class="col-lg-2 control-label">Password</label>
                     <div class="col-lg-10">
                       <input type="password" class="form-control" id="passwordField" ng-model="user.password" placeholder="password">
                     </div>
                   </div>
-                </fieldset>
+                  <div class="modal-footer">
+                    <button type="submit" class="btn btn-default" ng-click="onLogin()" data-dismiss="modal">Login</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target="#passwordResetModal">Forgot Password</button>
+                  </div>
                 </fieldset>
               </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" ng-click="onLogin()" ng-keypress="onLogin()" data-dismiss="modal">Login</button>
-          <button type="button" class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target="#passwordResetModal">Forgot Password</button>
         </div>
       </div>
       

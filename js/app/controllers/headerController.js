@@ -1,4 +1,4 @@
-lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeParams, $location, $filter, $sce) {
+lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeParams, $location, $filter, $sce, $interval) {
 	$scope.$route = $route;
     $scope.$location = $location;
     $scope.$routeParams = $routeParams;
@@ -13,6 +13,13 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 	updatePeople($scope, $http);
 
 	isSessionValid($scope, $http);
+
+	$scope.voteEnding = {
+		days : 0,
+		hours : 0,
+		minutes : 0,
+		seconds : 0
+	};
 
 	$scope.$on('UpdateGames', function(event, value){
 		$scope.games = value;
@@ -129,6 +136,17 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 			$location.path('/');
 		 });
 	}
+
+	$interval(function()
+	{
+		var voteEnd = new Date(2016,10,19,00,00,00);
+		var diff = voteEnd.getTime() - Date.now();
+
+		$scope.voteEnding.seconds = Math.floor( (diff/1000) % 60 );
+		$scope.voteEnding.minutes = Math.floor( (diff/1000/60) % 60 );
+		$scope.voteEnding.hours = Math.floor( (diff/(1000*60*60)) % 24 );
+		$scope.voteEnding.days = Math.floor( diff/(1000*60*60*24) );	
+	},1000);
 });
 
 function isSessionValid($scope, $http)
@@ -164,4 +182,9 @@ function logoutHandler()
   document.getElementById("updateScoresLink").hidden = true;
   document.getElementById("logoutLink").hidden = true;
   document.getElementById("loginLink").hidden = false;
+}
+
+function getTimeTillVoteEnd(scope)
+{
+	
 }

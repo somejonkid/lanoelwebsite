@@ -5,7 +5,9 @@
 		<br/>
 	</div>
 	<div class="jumbotron" style="background-image: url('../images/pat.png'); background-repeat: repeat-x; background-size: 100px 100px;">
-</div>
+		<h3 style="color:white; text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">
+			Voting Ends in {{voteEnding.days}} days, {{voteEnding.hours}} hours, {{voteEnding.minutes}} minutes, {{voteEnding.seconds}} seconds at 2016-11-18 11:59:59</h3>
+	</div>
 	<div class="row">
 	  <div class="col-lg-6">
 		<div class="well bs-component">
@@ -21,7 +23,7 @@
 				</tr>
 			  </thead>
 			  <tbody>
-				<tr ng-repeat="person in people">
+				<tr ng-repeat="person in people" onclick="getTimeTillVoteEnd()">
 				  <td>{{ person.personName }}</td>
 				  <td><img src="{{ gameImageForTable(person.gameVote3) }}" width="150" height="50" /></td>
 				  <td><img src="{{ gameImageForTable(person.gameVote2) }}" width="150" height="50" /></td>
@@ -35,7 +37,7 @@
 	  <div class="col-lg-4 col-lg-offset-1">
 
 		  <div class="panel panel-info">
-		  <div class="panel-heading"><b>LANoel 2015 Games</b></div>
+		  <div class="panel-heading"><b>Top Ranking Games</b></div>
 		  <div class="panel-body">
 			<div class="list-group" ng-repeat="game in topFiveGames">
 			  <a ng-href="/game/{{game.gameKey}}" class="list-group-item">
