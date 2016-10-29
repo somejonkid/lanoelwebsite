@@ -5,12 +5,16 @@
                 <div class="col-lg-4">
                     <img ng-src="{{selectedGame.steamInfo.header_image}}" />
                 </div>
-                <div class="col-lg-4">
+                <div class="col-lg-2">
                 </div>
-                <div class="col-lg-4">
-                    <h1>Number of Votes: {{ selectedGame.voteTotal }}</h1>
-                    <br/>
-                    <h3>Price on Steam: ${{selectedGame.steamInfo.price_overview.final}} </h3>
+                <div class="col-lg-6">
+                    <p class="text-info small">
+                        <h3>Number of Votes:<span class="text-danger"> {{ selectedGame.voteTotal }}</span></h3>
+                        <br/>
+                        <h3>Price on Steam:<span class="text-success"> ${{selectedGame.steamInfo.price_overview.final}} </span></h3>
+                        <br/>
+                        <h3>Free Copy Available <input type="checkbox" ng-click="updateGame()" ng-model="selectedGame.free"></h3>
+                    </p>
                 </div>
             </div>
         </div>

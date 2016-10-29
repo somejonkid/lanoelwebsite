@@ -82,6 +82,17 @@ function updateGames($scope, $http)
 	});
 }
 
+function updateFullOwnership($scope, $http)
+{
+	$http({
+			method: 'GET',
+			url: 'http://lanoel.elasticbeanstalk.com/lanoel/ownership',
+			data: { }
+		}).success(function (result) {
+			$scope.$emit('SetPrices', result);
+	});
+}
+
 function checkSteamImage(game)
 {
 	if(game.steamInfo == null)

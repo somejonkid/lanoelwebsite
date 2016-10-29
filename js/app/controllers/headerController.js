@@ -1,4 +1,4 @@
-lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeParams, $location, $filter, $sce, $interval) {
+lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeParams, $location, $filter, $sce, $interval, $timeout) {
 	$scope.$route = $route;
     $scope.$location = $location;
     $scope.$routeParams = $routeParams;
@@ -21,21 +21,69 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		seconds : 0
 	};
 
+	$scope.$on('SetPrices', function(event, gameOwnership){
+		
+		if($scope.topFiveGames.length == 0)
+		{
+			$timeout(function()
+			{
+				console.log("waiting for top five games to be populated");
+			}, 1000);
+		}
+
+		for(var i = 0; i < $scope.people.length; i++)
+		{
+			$scope.people[i].priceToBuyTopFive = 0;
+		}
+
+		for(var i = 0; i < $scope.topFiveGames.length; i++)
+		{
+			var curgame = $scope.topFiveGames[i];
+			var curOwnership = $filter('filter')(gameOwnership, {game : {gameKey : curgame.gameKey}}, true)[0];
+			
+			for(var j = 0; j < curOwnership.nonOwners.length; j++)
+			{
+				var nonOwner = curOwnership.nonOwners[j];
+				var person = $filter('filter')($scope.people, {personKey : nonOwner.personKey}, true)[0];
+				if(!curgame.free)
+				{
+					if(curgame.steamInfo != null)
+					{
+						person.priceToBuyTopFive += curgame.steamInfo.price_overview == null ? 0 : curgame.steamInfo.price_overview.final / 100;
+					}	
+				}
+			}
+		}
+
+		for(var i = 0; i < $scope.people.length; i++)
+		{
+			$scope.people[i].priceToBuyTopFive = $scope.people[i].priceToBuyTopFive.toFixed(2);
+		}
+	});
+
 	$scope.$on('UpdateGames', function(event, value){
 		$scope.games = value;
 	});
 
 	$scope.$on('UpdateTopFiveGames', function(event, value){
 		$scope.topFiveGames = value;
+
+		for(var i = 0; i < $scope.topFiveGames.length; i++)
+		{
+			var game = $scope.topFiveGames[i]; 
+			$scope.topFiveGames[i].currentPrice = (game.free || game.steamInfo == null || game.steamInfo.price_overview == null) ? "Free!!" : "$" + game.steamInfo.price_overview.final / 100;
+		}
 	});
 
 	$scope.$on('UpdatePeople', function(event, value){
 		$scope.people = value;
+		updateFullOwnership($scope, $http);
 	});
 
 	$scope.$on('Login', function(event, value){
 		document.getElementById("updateScoresLink").hidden = false;
 		document.getElementById("logoutLink").hidden = false;
+		$scope.selectedPerson = $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0];
 	});
 
 	$scope.$on('Logout', function(event, value){
@@ -182,9 +230,4 @@ function logoutHandler()
   document.getElementById("updateScoresLink").hidden = true;
   document.getElementById("logoutLink").hidden = true;
   document.getElementById("loginLink").hidden = false;
-}
-
-function getTimeTillVoteEnd(scope)
-{
-	
 }
