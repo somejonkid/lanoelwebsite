@@ -1,13 +1,6 @@
 lanoelApp.controller('GameController', ['$scope','$http','$routeParams','$sce','$filter', function($scope, $http, $routeParams, $sce, $filter) {
 	$scope.selectedGame = null;
-
-	$scope.$on('UpdateGames', function(event, value){
-		$scope.games = value;
-	});
-
-	$scope.$on('UpdateTopFiveGames', function(event, value){
-		$scope.topFiveGames = value;
-	});
+	refreshData($scope, $http);
 
 	$scope.renderHtml = function(html_code)
 	{

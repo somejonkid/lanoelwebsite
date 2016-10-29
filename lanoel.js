@@ -55,42 +55,56 @@ lanoelApp.controller('MainController', function($scope) {
 	$scope.message = 'Look! I am an about page.';
 });
 
-function updatePlacesInScoring($scope)
+function refreshData($scope, $http)
 {
-
-}
-
-function updateGames($scope, $http)
-{
-	$http({
-			method: 'GET',
-			url: 'http://lanoel.elasticbeanstalk.com/lanoel/gamelist',
-			data: { }
-		}).success(function (result) {
-			$scope.games = result.sort(compareGames);
-			$scope.games.forEach(checkSteamImage);
-			$scope.$emit('UpdateGames', $scope.games);
-	});
-
 	$http({
 			method: 'GET',
 			url: 'http://lanoel.elasticbeanstalk.com/lanoel/topfivegames',
 			data: { }
 		}).success(function (result) {
+			
 			$scope.topFiveGames = result;
+			for(var i = 0; i < $scope.topFiveGames.length; i++)
+			{
+				var game = $scope.topFiveGames[i]; 
+				$scope.topFiveGames[i].currentPrice = (game.free || game.steamInfo == null || game.steamInfo.price_overview == null) ? "Free!!" : "$" + game.steamInfo.price_overview.final / 100;
+			}
 			$scope.$emit('UpdateTopFiveGames', $scope.topFiveGames);
 	});
-}
 
-function updateFullOwnership($scope, $http)
-{
 	$http({
 			method: 'GET',
 			url: 'http://lanoel.elasticbeanstalk.com/lanoel/ownership',
 			data: { }
 		}).success(function (result) {
+			
+			var games = [];
+			for(var i = 0; i < result.length; i++)
+			{
+				games.push(result[i].game);
+			}
+
+			var people = [];
+			for(var i = 0; i < result[0].owners.length; i++)
+			{
+				people.push(result[0].owners[i]);
+			}
+
+			for(var i = 0; i < result[0].nonOwners.length; i++)
+			{
+				people.push(result[0].nonOwners[i]);
+			}
+
+			$scope.games = games.sort(compareGames);
+			$scope.games.forEach(checkSteamImage);
+
+			$scope.people = people.sort(comparePeople);
+			sessionStorage.personCache = JSON.stringify(people);
+
 			$scope.$emit('SetPrices', result);
+			$scope.$emit('Refresh', $scope.games);
 	});
+
 }
 
 function checkSteamImage(game)
@@ -100,19 +114,6 @@ function checkSteamImage(game)
 		game.steamInfo = {};
 		game.steamInfo.header_image = 'http://dummyimage.com/600x400/000/fff&text=' + game.gameName;
 	}
-}
-
-function updatePeople($scope, $http)
-{
-	$http({
-			method: 'GET',
-			url: 'http://lanoel.elasticbeanstalk.com/lanoel/personlist',
-			data: { }
-		}).success(function (result) {
-			$scope.people = result.sort(comparePeople);
-			sessionStorage.personCache = JSON.stringify(result);
-			$scope.$emit('UpdatePeople', result);
-	});
 }
 
 function updatePerson($scope, $http, $routeParams)

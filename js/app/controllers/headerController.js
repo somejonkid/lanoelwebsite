@@ -8,10 +8,7 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 	$scope.people =[];
 	$scope.selectedPerson = null;
 
-	updateGames($scope, $http);
-
-	updatePeople($scope, $http);
-
+	refreshData($scope, $http);
 	isSessionValid($scope, $http);
 
 	$scope.voteEnding = {
@@ -61,25 +58,6 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		}
 	});
 
-	$scope.$on('UpdateGames', function(event, value){
-		$scope.games = value;
-	});
-
-	$scope.$on('UpdateTopFiveGames', function(event, value){
-		$scope.topFiveGames = value;
-
-		for(var i = 0; i < $scope.topFiveGames.length; i++)
-		{
-			var game = $scope.topFiveGames[i]; 
-			$scope.topFiveGames[i].currentPrice = (game.free || game.steamInfo == null || game.steamInfo.price_overview == null) ? "Free!!" : "$" + game.steamInfo.price_overview.final / 100;
-		}
-	});
-
-	$scope.$on('UpdatePeople', function(event, value){
-		$scope.people = value;
-		updateFullOwnership($scope, $http);
-	});
-
 	$scope.$on('Login', function(event, value){
 		document.getElementById("updateScoresLink").hidden = false;
 		document.getElementById("logoutLink").hidden = false;
@@ -115,7 +93,7 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		}
 		if(sessionStorage.personCache === undefined)
 		{
-			updatePeople($scope, $http);
+			refreshData($scope, $http);
 		}
 		$location.path('person/' + $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0].personKey);
 	}
@@ -184,6 +162,11 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 			$location.path('/');
 		 });
 	}
+
+	$interval(function()
+	{
+		refreshData($scope, $http);
+	},10000);
 
 	$interval(function()
 	{

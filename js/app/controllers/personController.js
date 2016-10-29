@@ -2,6 +2,8 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	$scope.selectedPerson = $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0];
 	$scope.games = [];
 	$scope.topFiveGames = [];
+
+	refreshData($scope, $http);
 	$scope.showVoteSuccessMessage = true;
 
 	$scope.gameVote1Success = false;
@@ -57,21 +59,12 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	{
 		var myVote = {"gameKey":gameKey, "voteNumber":voteNumber}
 		vote($http, $scope.selectedPerson.personKey, myVote, $scope);
-		updateGames($scope, $http);
+		refreshData($scope, $http);
 	};
 
-	$scope.$on('UpdatePeople', function(event, value){
+	$scope.$on('Refresh', function(event, value){
 		$scope.selectedPerson = $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0];
-		updateGames($scope, $http);
-	});
-
-	$scope.$on('UpdateGames', function(event, value){
-		$scope.games = value;
 		$scope.setVoteFields();
-	});
-
-	$scope.$on('UpdateTopFiveGames', function(event, value){
-		$scope.topFiveGames = value;
 	});
 
 	$scope.$on('UpdateVote', function(event, value){
@@ -100,7 +93,7 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 			$scope.vote2Background = $scope.defaultBgColor;
 			$scope.vote3Background = $scope.defaultBgColor;
 		}, 1000);
-		updateGames($scope, $http);
+		refreshData($scope, $http);
 	});
 
 
@@ -164,8 +157,6 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 		$scope.goVote($scope.gameVote3selection.gameKey, 1);
 	}
 
-	updatePeople($scope, $http);
-
 	$http({
 			method: 'GET',
 			url: 'http://lanoel.elasticbeanstalk.com/lanoel/steamgames',
@@ -228,6 +219,6 @@ function addGame($scope, $http, gameName, personKey)
 			url: 'http://lanoel.elasticbeanstalk.com/lanoel/game',
 			data: {"gameName" : gameName}
 		}).then(function (result) {
-			updateGames($scope, $http);
+			refreshData($scope, $http);
 	});
 }
