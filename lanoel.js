@@ -59,21 +59,6 @@ function refreshData($scope, $http)
 {
 	$http({
 			method: 'GET',
-			url: 'http://lanoel.elasticbeanstalk.com/lanoel/topfivegames',
-			data: { }
-		}).success(function (result) {
-			
-			$scope.topFiveGames = result;
-			for(var i = 0; i < $scope.topFiveGames.length; i++)
-			{
-				var game = $scope.topFiveGames[i]; 
-				$scope.topFiveGames[i].currentPrice = (game.free || game.steamInfo == null || game.steamInfo.price_overview == null) ? "Free!!" : "$" + game.steamInfo.price_overview.final / 100;
-			}
-			$scope.$emit('UpdateTopFiveGames', $scope.topFiveGames);
-	});
-
-	$http({
-			method: 'GET',
 			url: 'http://lanoel.elasticbeanstalk.com/lanoel/ownership',
 			data: { }
 		}).success(function (result) {
@@ -98,13 +83,25 @@ function refreshData($scope, $http)
 			$scope.games = games.sort(compareGames);
 			$scope.games.forEach(checkSteamImage);
 
+			$scope.topFiveGames = [];
+
+			for(var i = 0; i < 5; i++)
+			{
+				$scope.topFiveGames.push($scope.games[i]);
+			}
+
+			for(var i = 0; i < $scope.topFiveGames.length; i++)
+			{
+				var game = $scope.topFiveGames[i]; 
+				$scope.topFiveGames[i].currentPrice = (game.free || game.steamInfo == null || game.steamInfo.price_overview == null) ? "Free!!" : "$" + game.steamInfo.price_overview.final / 100;
+			}
+
 			$scope.people = people.sort(comparePeople);
 			sessionStorage.personCache = JSON.stringify(people);
 
 			$scope.$emit('SetPrices', result);
 			$scope.$emit('Refresh', $scope.games);
 	});
-
 }
 
 function checkSteamImage(game)
@@ -138,7 +135,12 @@ function compareGames(game1, game2)
 	{
 		return 1;
 	}
-	return 0;
+	if(game1.numUniquePersonVotes > game2.numUniquePersonVotes)
+	{
+		return -1;
+	}
+
+	return 1;
 }
 
 function comparePeople(person1, person2)

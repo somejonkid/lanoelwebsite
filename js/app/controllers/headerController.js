@@ -163,12 +163,19 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		 });
 	}
 
-	$interval(function()
+	$scope.$on('$destroy', function()
+	{
+		//$interval.cancel(stopRefresh);
+		$interval.cancel(stopTimer);
+	});
+
+	/*var stopRefresh = $interval(function()
 	{
 		refreshData($scope, $http);
-	},10000);
+	},15000);
+	*/
 
-	$interval(function()
+	var stopTimer = $interval(function()
 	{
 		var voteEnd = new Date(2016,10,19,00,00,00);
 		var diff = voteEnd.getTime() - Date.now();
