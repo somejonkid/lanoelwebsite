@@ -118,6 +118,25 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		return game.steamInfo.header_image;
 	};
 
+	$scope.gameplayTime = function(person, inputGame)
+	{
+		var text = "Time Played: ";
+		if(inputGame == null || person == null)
+		{
+			return "Probably a lot...";
+		}
+
+		var game = $filter('filter')($scope.games, {gameName : inputGame}, true)[0];
+		if(game == undefined) return "Cannot find game!";
+		if(game.steamGame == undefined || game.steamGame == null) return "Nobody knows!"
+		var playtime = $filter('filter')(person.steamInfo.steamGameList, {appid : game.steamGame.appid}, true)[0];
+		if(playtime == undefined) return text + "0 minutes!";
+
+		var time = playtime.playtime_forever;
+
+		return time < 60 ? text + time + " minutes" : text + Math.round(time / 60) + " hours";
+	}
+
 	$scope.onLogin = function()
 	{
 		$http({

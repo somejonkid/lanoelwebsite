@@ -21,16 +21,22 @@
 						<th>First Choice</th>
 						<th>Second Choice</th>
 						<th>Third Choice</th>
-						<th>Total Cost for top five games</th>
+						<th>Top Five<br/>Game Cost</th>
 						</b></h5>
 					</tr>
 					</thead>
 					<tbody>
 					<tr ng-repeat="person in people" onclick="getTimeTillVoteEnd()">
 						<td>{{ person.personName }}</td>
-						<td><img src="{{ gameImageForTable(person.gameVote3) }}" width="150" height="50" /></td>
-						<td><img src="{{ gameImageForTable(person.gameVote2) }}" width="150" height="50" /></td>
-						<td><img src="{{ gameImageForTable(person.gameVote1) }}" width="150" height="50" /></td>
+						<td><img src="{{ gameImageForTable(person.gameVote3) }}" width="150" height="50" />
+							<span class=".small"><br/>{{gameplayTime(person, person.gameVote3)}}</span>
+						</td>
+						<td><img src="{{ gameImageForTable(person.gameVote2) }}" width="150" height="50" />
+							<span class=".small"><br/>{{gameplayTime(person, person.gameVote2)}}</span>
+						</td>
+						<td><img src="{{ gameImageForTable(person.gameVote1) }}" width="150" height="50" />
+							<span class=".small"><br/>{{gameplayTime(person, person.gameVote1)}}</span>
+						</td>
 						<td style="border-left: 3px solid black; text-align: center"><h4><span class="text-success">${{person.priceToBuyTopFive}}</span></h4></td>
 					</tr>
 					</tbody>
