@@ -1,7 +1,8 @@
-lanoelApp.controller('UpdateScoresController', function($scope, $http, $routeParams, $location, $timeout) {
+lanoelApp.controller('UpdateScoresController', function($scope, $http, $routeParams, $location, $timeout, $animate) {
 	$scope.tournament = null;
 	$scope.scores = [];
 	$scope.rounds = [];
+	$scope.selected = null;
 
 	$scope.selectedRound = null;
 
@@ -39,11 +40,17 @@ lanoelApp.controller('UpdateScoresController', function($scope, $http, $routePar
 				data: $scope.selectedRound.places
 			}).success(function (data, status, headers, config) {
 				setSession(headers('sessionid'), $location);
-				document.getElementById("successUpdateMessage").hidden = false;
-				$timeout(function(){document.getElementById("successUpdateMessage").hidden = true}, 3000);
+				document.getElementById("scorePanel").className = "panel panel-success lanoeltransition";
+				$timeout(function(){
+					document.getElementById("scorePanel").className = "panel panel-info lanoeltransition";
+				}, 1000);
 			}).error(function (data, status, headers, config) {
 				// called asynchronously if an error occurs
 				// or server returns response with an error status.
+				document.getElementById("scorePanel").className = "panel panel-error lanoeltransition";
+				$timeout(function(){
+					document.getElementById("scorePanel").className = "panel panel-info lanoeltransition";
+				}, 1000);
 				setSession(headers('sessionid'), $location);
 				clearSession();
 				$scope.$emit('Logout', $scope.user);

@@ -199,10 +199,15 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		var voteEnd = new Date(2016,10,19,00,00,00);
 		var diff = voteEnd.getTime() - Date.now();
 
-		$scope.voteEnding.seconds = Math.floor( (diff/1000) % 60 );
-		$scope.voteEnding.minutes = Math.floor( (diff/1000/60) % 60 );
-		$scope.voteEnding.hours = Math.floor( (diff/(1000*60*60)) % 24 );
-		$scope.voteEnding.days = Math.floor( diff/(1000*60*60*24) );	
+		var seconds = Math.floor( (diff/1000) % 60 );
+		var minutes = Math.floor( (diff/1000/60) % 60 );
+		var hours = Math.floor( (diff/(1000*60*60)) % 24 ); 
+		var days = Math.floor( diff/(1000*60*60*24) );
+
+		$scope.voteEnding.seconds = Math.max(seconds, 0);
+		$scope.voteEnding.minutes = Math.max(minutes, 0);
+		$scope.voteEnding.hours = Math.max(hours, 0); 
+		$scope.voteEnding.days = Math.max(days, 0);		
 	},1000);
 });
 

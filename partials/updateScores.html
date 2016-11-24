@@ -1,52 +1,56 @@
 <div class="container-fluid">
-   <div class="row container-fluid">
-		<div class="alert alert-dismissible alert-success" hidden=true id="successUpdateMessage">
-		  <button type="button" class="close" data-dismiss="alert">X</button>
-		  <strong>Update Successful!</strong>
-		</div>
-      <div class="container-fluid">
-         <h3>
-            <center>Rounds</center>
-         </h3>
-         <ul class="nav nav-tabs">
-            <li class="" ng-repeat="round in rounds" ng-click="onTabClick(round)" ng-class="{active:$first}"><a data-toggle="tab" aria-expanded="false">{{ round.game.gameName }}</a></li>
-         </ul>
-		 
-         
-		 <div id="myTabContent" class="tab-content">
+	<div class="row container-fluid">
+		<div class="container-fluid">
+			<h3>
+				<center>Rounds</center>
+			</h3>
+			<ul class="nav nav-tabs">
+				<li class="" ng-repeat="round in rounds" ng-click="onTabClick(round)" ng-class="{active:$first}"><a data-toggle="tab" aria-expanded="false">{{ round.game.gameName }}</a></li>
+			</ul>
+
+
+			<div id="myTabContent" class="tab-content">
 
 				<div class="container-fluid">
-				<div class="panel panel-success">
-				  <div class="input-group panel-heading">
-						<span class="input-group-btn">
-						  <button class="btn btn-default" type="button" ng-click="onSubmit()">Submit scores</button>
-						</span>
-				  </div>
-				  <div class="panel-body">
-				<div class='ng-cloak'>
-					<div class='content'>
-					  <div class="">
-						<ul class="list-group">
-						  <li style="margin-bottom: 4px; border: 1px solid gray" class="list-group-item form-control" ng-repeat="place in selectedRound.places" data-drop="true" data-drag="true" ng-model="selectedRound.places" jqyoui-droppable="{index: {{$index}}, animate:true}" jqyoui-draggable="{index: {{$index}}, insertInline: false, direction:'jqyouiDirection', animate:true}" data-jqyoui-options="{revert: 'invalid'}" data-direction="{{person.jqyouiDirection}}">
-								  <span class="label label-danger col-md-1" >
-								  {{ $index + 1 }}
-								  </span>
-								  <span>
-								  <span class="text-warning col-md-3">
-								  <b>{{place.person}}</b>
-								  </span>
-								  </span>
-						  </li>
-						</ul>
-					  </div>
+					<div id="scorePanel" class="panel panel-info lanoeltransition">
+						<div class="input-group panel-heading">
+							<span class="input-group-btn">
+									<button class="btn btn-default" type="button" ng-click="onSubmit()">Submit scores</button>
+								</span>
+						</div>
+						<div class="panel-body lanoelList">
+							<div class='panel-body ng-scope'>
+								<div class="ng-scope container-fluid">
+									<ul dnd-list="selectedRound.places" class="col-lg-4">
+										<li ng-repeat="place in selectedRound.places" dnd-draggable="place" dnd-moved="selectedRound.places.splice($index, 1)" dnd-effect-allowed="move"
+											dnd-selected="selected = place" class="background-man">
+											<dnd-nodrag>
+												<div dnd-handle class="handle">
+													<span>
+														<h4>
+														<div class="col-lg-2">
+															{{ $index + 1 }}
+														</div>
+														<div class="col-lg-2">
+															<b>{{place.person}}</b>
+														</div>
+														</h4>
+													</span>
+												</div>
+											</dnd-nodrag>
+										</li>
+										<li class="dndPlaceholder">
+											Drop any <strong>person</strong> here
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
 					</div>
-				  </div>
-				  </div>
-				    </div>
+				</div>
 			</div>
-			</div>
-				 
-		 </div>
-      </div>
-   </div>
+
+		</div>
+	</div>
+</div>
 </div>

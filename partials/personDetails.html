@@ -25,7 +25,7 @@
                   <div class="form-group">
                     <label for="select" class="col-lg-2 control-label has-error">1<sup>st</sup> Choice<br/>(3 points)</label>
                     <div class="col-lg-10">
-                      <select class="form-control" ng-style="vote1Background" ng-model="gameVote1selection" ng-change="onGameVote1Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
+                      <select ng-disabled="votingDisabled" class="form-control" ng-style="vote1Background" ng-model="gameVote1selection" ng-change="onGameVote1Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
                       </select>
                       <img src="../images/checkmark.png" style="width:10px;height:10px;" ng-show="gameVote1Success"/>
                       <div ng-show="gameVote1Error">Cannot vote for single player games</div>
@@ -35,7 +35,7 @@
 				  <div class="form-group">
                     <label for="select" class="col-lg-2 control-label has-warning">2<sup>nd</sup> Choice<br/>(2 points)</label>
                     <div class="col-lg-10">
-                      <select class="form-control" ng-style="vote2Background" ng-model="gameVote2selection" ng-change="onGameVote2Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
+                      <select ng-disabled="votingDisabled" class="form-control" ng-style="vote2Background" ng-model="gameVote2selection" ng-change="onGameVote2Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
                       </select>
                       <img src="../images/checkmark.png" style="width:10px;height:10px;" ng-show="gameVote2Success"/>
                       <div ng-show="gameVote2Error">Cannot vote for single player games</div>
@@ -45,7 +45,7 @@
 				  <div class="form-group">
                     <label for="select" class="col-lg-2 control-label has-success">3<sup>rd</sup> Choice<br/>(1 point)</label>
                     <div class="col-lg-10">
-                      <select class="form-control" ng-style="vote3Background" ng-model="gameVote3selection" ng-change="onGameVote3Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
+                      <select ng-disabled="votingDisabled" class="form-control" ng-style="vote3Background" ng-model="gameVote3selection" ng-change="onGameVote3Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
                       </select>
                       <img src="../images/checkmark.png" style="width:10px;height:10px;" ng-show="gameVote3Success"/>
                       <div ng-show="gameVote3Error">Cannot vote for single player games</div>

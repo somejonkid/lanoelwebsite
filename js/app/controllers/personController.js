@@ -2,6 +2,8 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	$scope.selectedPerson = $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0];
 	$scope.games = [];
 	$scope.topFiveGames = [];
+	var voteEnd = new Date(2016,10,19,00,00,00);
+	$scope.votingDisabled = (voteEnd.getTime() - Date.now() < 0);
 
 	refreshData($scope, $http);
 	$scope.showVoteSuccessMessage = true;
