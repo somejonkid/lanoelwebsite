@@ -93,7 +93,7 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		}
 		if(sessionStorage.personCache === undefined)
 		{
-			refreshData($scope, $http);
+			//refreshData($scope, $http);
 		}
 		$location.path('person/' + $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0].personKey);
 	}
