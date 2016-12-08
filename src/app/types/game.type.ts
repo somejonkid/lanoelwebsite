@@ -5,8 +5,8 @@ export class Game{
     location: String;
     numUniquePersonVotes: Number;
     rules: String;
-    steamGame: SteamGame;
-    steamInfo: SteamInfo;
+    steamGame: SteamGame = new SteamGame();
+    steamInfo: SteamInfo = new SteamInfo();
     voteTotal: Number;
 }
 

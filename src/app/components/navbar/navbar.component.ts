@@ -19,4 +19,14 @@ export class NavbarComponent implements OnInit{
             .then(games => this.games = games);
     }
 
+    private validateGameHeader(game:Game): String
+    {
+        if (game.steamInfo == null || game.steamInfo.header_image == null)
+        {
+            return "http://dummyimage.com/600x400/000/fff&text=" + game.gameName;
+        }
+
+        return game.steamInfo.header_image;
+    }
+
 }
