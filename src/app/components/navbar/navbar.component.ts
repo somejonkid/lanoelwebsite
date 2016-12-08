@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { Game } from '../../types/game.type';
 import { GameService } from '../../services/games.service';
+import { LoginService } from '../../services/login.service';
 
 @Component ({
     selector: "navbar",
@@ -10,13 +11,16 @@ import { GameService } from '../../services/games.service';
 })
 export class NavbarComponent implements OnInit{
     private games: Game[];
-    authenticated():boolean{return false;}
+    private authenticated = false;
 
-    constructor(private gameService:GameService){}
+    constructor(private gameService:GameService,
+                private loginService:LoginService){}
 
     ngOnInit(){
         this.gameService.getGamesList()
             .then(games => this.games = games);
+        this.authenticated = this.loginService.isAuthenticated();
+        
     }
 
     private validateGameHeader(game:Game): String
@@ -28,5 +32,10 @@ export class NavbarComponent implements OnInit{
 
         return game.steamInfo.header_image;
     }
+
+    private doLogin(){
+        this.authenticated = true;
+    }
+
 
 }
