@@ -1,4 +1,4 @@
-lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeParams, $location, $filter, $sce, $interval, $timeout) {
+lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeParams, $location, $filter, $sce, $interval, $timeout, lanoelService) {
 	$scope.$route = $route;
     $scope.$location = $location;
     $scope.$routeParams = $routeParams;
@@ -7,9 +7,6 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 	$scope.topFiveGames = [];
 	$scope.people =[];
 	$scope.selectedPerson = null;
-
-	refreshData($scope, $http);
-	isSessionValid($scope, $http);
 
 	$scope.voteEnding = {
 		days : 0,
@@ -58,12 +55,6 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		}
 	});
 
-	$scope.$on('Login', function(event, value){
-		document.getElementById("updateScoresLink").hidden = false;
-		document.getElementById("logoutLink").hidden = false;
-		$scope.selectedPerson = $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0];
-	});
-
 	$scope.$on('Logout', function(event, value){
 		logoutHandler();
 		$location.path('/');
@@ -87,14 +78,6 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 
 	$scope.getMyAccount = function()
 	{
-		if(!isSessionValid($scope, $http))
-		{
-			$scope.$emit('Logout', $scope.user);
-		}
-		if(sessionStorage.personCache === undefined)
-		{
-			//refreshData($scope, $http);
-		}
 		$location.path('person/' + $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0].personKey);
 	}
 
@@ -111,7 +94,7 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 	{
 		if(inputGame == null)
 		{
-			return "http://dummyimage.com/150x50/000/fff&text=Circle%20Jerk";
+			return "http://dummyimage.com/150x50/000/fff&text=No%20Vote";
 		}
 		var game = $filter('filter')($scope.games, {gameName : inputGame}, true)[0];
 		if(game == undefined) return;
@@ -139,47 +122,37 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 
 	$scope.onLogin = function()
 	{
-		$http({
-			method: 'POST',
-			url: 'https://accounts.omegasixcloud.net/accounts/login',
-			headers : {
-				'username' : $scope.user.username,
-				'password' : $scope.user.password
-			}
-		}).success(function (data, status, headers, config) {
-			setSession(headers("sessionid"), $scope.user.username);
+		lanoelService.login($scope.user.username, $scope.user.password).then(function(){
+			sessionStorage.setItem('userName', "");
+			document.getElementById("updateScoresLink").hidden = false;
+			document.getElementById("logoutLink").hidden = false;
+			$scope.selectedPerson = $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0];
 			$scope.user.username = null;
 			$scope.user.password = null;
 			$scope.$emit('Login', $scope.user);
 			$location.path('/');
-		})
-		.error(function(data, status, headers, config) {
+		}, function(){
 			// called asynchronously if an error occurs
 			// or server returns response with an error status.
 			$scope.user.username = null;
 			$scope.user.password = null;
+			document.getElementById("updateScoresLink").hidden = true;
+			document.getElementById("logoutLink").hidden = true;
 			clearSession();
 			document.getElementById("loginErrorAlert").hidden = false;
-		 });
+		});
 	}
 
 	$scope.onPasswordReset = function()
 	{
-		$http({
-			method: 'POST',
-			url: 'https://accounts.omegasixcloud.net/accounts/resetpassword',
-			headers : {
-				'email' : $scope.user.email
-			}
-		}).success(function (data, status, headers, config) {
+		lanoelService.resetPassword($scope.email).then(function (data, status, headers, config) {
 			$location.path('/');
-		})
-		.error(function(data, status, headers, config) {
+		}, function() {
 			// called asynchronously if an error occurs
 			// or server returns response with an error status.
 			clearSession();
 			$location.path('/');
-		 });
+		});
 	}
 
 	$scope.$on('$destroy', function()
@@ -188,11 +161,13 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		$interval.cancel(stopTimer);
 	});
 
-	/*var stopRefresh = $interval(function()
-	{
-		refreshData($scope, $http);
-	},15000);
-	*/
+	function getLanoelTournament() {
+		lanoelService.getLanoelTournament().then(function(result){
+			$scope.tournament = result;
+			$scope.scores = $scope.tournament.scores;
+			$scope.rounds = $scope.tournament.rounds;
+		});
+	}
 
 	var stopTimer = $interval(function()
 	{
@@ -209,28 +184,22 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		$scope.voteEnding.hours = Math.max(hours, 0); 
 		$scope.voteEnding.days = Math.max(days, 0);		
 	},1000);
-});
 
-function isSessionValid($scope, $http)
-{
-		$http({
-			method: 'GET',
-			url: 'https://accounts.omegasixcloud.net/accounts/user',
-			headers : {
-				'sessionid' : sessionStorage.sessionid
-			}
-		}).success(function (data, status, headers, config) {
-			sessionStorage.sessionid = headers("sessionid");
-			return true;
-		})
-		.error(function(data, status, headers, config) {
-			// called asynchronously if an error occurs
-			// or server returns response with an error status.
-			clearSession();
-			$scope.$emit('Logout', $scope.user);
-			return false;
-		 });
-};
+	function init() {
+		
+		lanoelService.getGameOwnership($routeParams.gameKey).then(function(result){
+			$scope.owners = result.owners;
+			$scope.nonowners = result.nonOwners;
+			$scope.games = result.games;
+			$scope.topFiveGames = result.topFiveGames;
+			$scope.people = result.people;
+			sessionStorage.personCache = JSON.stringify(people);
+		});
+		getLanoelTournament();
+	}
+
+	init();
+});
 
 function clearSession()
 {

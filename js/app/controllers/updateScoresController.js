@@ -1,4 +1,4 @@
-lanoelApp.controller('UpdateScoresController', function($scope, $http, $routeParams, $location, $timeout, $animate) {
+lanoelApp.controller('UpdateScoresController', function($scope, $http, $routeParams, $location, $timeout, $animate, lanoelService) {
 	$scope.tournament = null;
 	$scope.scores = [];
 	$scope.rounds = [];
@@ -6,10 +6,8 @@ lanoelApp.controller('UpdateScoresController', function($scope, $http, $routePar
 
 	$scope.selectedRound = null;
 
-	$http({
-			method: 'GET',
-			url: 'http://lanoel.elasticbeanstalk.com/tournament/1',
-		}).success(function (result) {
+	function getLanoelTournament() {
+		lanoelService.getLanoelTournament().then(function(result){
 			$scope.tournament = result;
 			for(var i = 0; i < $scope.tournament.rounds.length; i++)
 			{
@@ -18,7 +16,8 @@ lanoelApp.controller('UpdateScoresController', function($scope, $http, $routePar
 			$scope.scores = $scope.tournament.scores;
 			$scope.rounds = $scope.tournament.rounds;
 			$scope.selectedRound = $scope.rounds[0];
-	});
+		})
+	}
 
     $scope.onTabClick = function(round)
 	{
@@ -33,28 +32,21 @@ lanoelApp.controller('UpdateScoresController', function($scope, $http, $routePar
 
 	$scope.postUpdateScore = function()
 	{
-		$http({
-				method: 'POST',
-				url: 'http://lanoel.elasticbeanstalk.com/tournament/1/' + $scope.selectedRound.roundNumber + '/updateScores',
-				headers: {"sessionid" : sessionStorage.sessionid},
-				data: $scope.selectedRound.places
-			}).success(function (data, status, headers, config) {
-				setSession(headers('sessionid'), $location);
-				document.getElementById("scorePanel").className = "panel panel-success lanoeltransition";
-				$timeout(function(){
-					document.getElementById("scorePanel").className = "panel panel-info lanoeltransition";
-				}, 1000);
-			}).error(function (data, status, headers, config) {
-				// called asynchronously if an error occurs
-				// or server returns response with an error status.
-				document.getElementById("scorePanel").className = "panel panel-error lanoeltransition";
-				$timeout(function(){
-					document.getElementById("scorePanel").className = "panel panel-info lanoeltransition";
-				}, 1000);
-				setSession(headers('sessionid'), $location);
-				clearSession();
-				$scope.$emit('Logout', $scope.user);
-				$location.path('/login');
+		lanoelService.updateLanoelScore().then(function(result){
+			setSession(headers('sessionid'), $location);
+			document.getElementById("scorePanel").className = "panel panel-success lanoeltransition";
+			$timeout(function(){
+				document.getElementById("scorePanel").className = "panel panel-info lanoeltransition";
+			}, 1000);
+		}, function(result){
+			document.getElementById("scorePanel").className = "panel panel-error lanoeltransition";
+			$timeout(function(){
+				document.getElementById("scorePanel").className = "panel panel-info lanoeltransition";
+			}, 1000);
+			setSession(headers('sessionid'), $location);
+			clearSession();
+			$scope.$emit('Logout', $scope.user);
+			$location.path('/login');
 		});
 	}
 
@@ -66,13 +58,8 @@ lanoelApp.controller('UpdateScoresController', function($scope, $http, $routePar
 		}
 	}
 
-	//$scope.dataDropped = function(event, ui)
-	//{
-	//	updatePlacesInScoring($scope);
-	//}
-
-	//$scope.deactivate = function(event, ui)
-	//{
-	//	updatePlacesInScoring($scope);
-	//}
+	function init() {
+		getLanoelTournament();
+	}
+	init();
 });

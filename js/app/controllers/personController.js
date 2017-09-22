@@ -1,11 +1,10 @@
-lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $filter, $timeout) {
+lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $filter, $timeout, lanoelService) {
 	$scope.selectedPerson = $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0];
 	$scope.games = [];
 	$scope.topFiveGames = [];
 	var voteEnd = new Date(2016,10,19,00,00,00);
 	$scope.votingDisabled = (voteEnd.getTime() - Date.now() < 0);
 
-	refreshData($scope, $http);
 	$scope.showVoteSuccessMessage = true;
 
 	$scope.gameVote1Success = false;
@@ -60,44 +59,34 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	$scope.goVote = function(gameKey, voteNumber)
 	{
 		var myVote = {"gameKey":gameKey, "voteNumber":voteNumber}
-		vote($http, $scope.selectedPerson.personKey, myVote, $scope);
-		refreshData($scope, $http);
+		lanoelService.vote($scope.selectedPerson.personKey, myVote).then(function(result){
+			var successBgColor = {}
+			if(value == 3)
+			{
+				$scope.gameVote1Success = true;
+				$scope.vote1Background = $scope.successBgColor;
+			}
+			if(value == 2)
+			{
+				$scope.gameVote2Success = true;
+				$scope.vote2Background = $scope.successBgColor;
+			}
+			if(value == 1)
+			{
+				$scope.gameVote3Success = true;
+				$scope.vote3Background = $scope.successBgColor;
+			}
+			$timeout(function(){
+				$scope.gameVote1Success = false;
+				$scope.gameVote2Success = false;
+				$scope.gameVote3Success = false;
+				$scope.vote1Background = $scope.defaultBgColor;
+				$scope.vote2Background = $scope.defaultBgColor;
+				$scope.vote3Background = $scope.defaultBgColor;
+			}, 1000);
+			refreshGameOwnership();
+		});
 	};
-
-	$scope.$on('Refresh', function(event, value){
-		$scope.selectedPerson = $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0];
-		$scope.setVoteFields();
-	});
-
-	$scope.$on('UpdateVote', function(event, value){
-		
-		var successBgColor = {}
-		if(value == 3)
-		{
-			$scope.gameVote1Success = true;
-			$scope.vote1Background = $scope.successBgColor;
-		}
-		if(value == 2)
-		{
-			$scope.gameVote2Success = true;
-			$scope.vote2Background = $scope.successBgColor;
-		}
-		if(value == 1)
-		{
-			$scope.gameVote3Success = true;
-			$scope.vote3Background = $scope.successBgColor;
-		}
-		$timeout(function(){
-			$scope.gameVote1Success = false;
-			$scope.gameVote2Success = false;
-			$scope.gameVote3Success = false;
-			$scope.vote1Background = $scope.defaultBgColor;
-			$scope.vote2Background = $scope.defaultBgColor;
-			$scope.vote3Background = $scope.defaultBgColor;
-		}, 1000);
-		refreshData($scope, $http);
-	});
-
 
 	$scope.onGameVote1Change = function()
 	{
@@ -159,19 +148,36 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 		$scope.goVote($scope.gameVote3selection.gameKey, 1);
 	}
 
-	$http({
-			method: 'GET',
-			url: 'http://lanoel.elasticbeanstalk.com/lanoel/steamgames',
-			data: { }
-		}).success(function (result) {
-		$scope.fullSteamGameList = result;
-	});
-
 	$scope.addNewGame = function(name)
 	{
-		addGame($scope, $http, name, $routeParams.personKey);
-		$scope.newGameName = null;
+		lanoelService.addGame({"gameName" : gameName}).then(function(){
+			refreshGameOwnership();
+		});
 	};
+
+	function refreshSteamGameList() {
+		lanoelService.getSteamGames().then(function(result){
+			$scope.fullSteamGameList = result;
+		})
+	}
+
+	function refreshGameOwnership() {
+		lanoelService.getGameOwnership($routeParams.gameKey).then(function(result){
+			$scope.owners = result.owners;
+			$scope.nonowners = result.nonOwners;
+			$scope.games = result.games;
+			$scope.topFiveGames = result.topFiveGames;
+			$scope.people = result.people;
+			sessionStorage.personCache = JSON.stringify(people);
+		});
+	}
+
+	function init() {
+		refreshGameOwnership();
+		refreshSteamGameList();
+	}
+
+	init();
 });
 
 function validGameSelection(selectedGame)
@@ -197,30 +203,4 @@ function validGameSelection(selectedGame)
 	}
 
 	return (hasSinglePlayer && !hasMultiPlayer) ? false : true;
-}
-
-function vote($http, personKey, myVote, $scope)
-{
-	$http({
-			method: 'POST',
-			url: 'http://lanoel.elasticbeanstalk.com/lanoel/person/' + personKey + '/vote',
-			data: myVote,
-			headers : {
-				'sessionid' : sessionStorage.sessionid
-			}
-		}).then(function (result) {
-			sessionStorage.sessionid = result.headers("sessionid");
-			$scope.$emit('UpdateVote', myVote.voteNumber);
-		});
-}
-
-function addGame($scope, $http, gameName, personKey)
-{
-	$http({
-			method: 'POST',
-			url: 'http://lanoel.elasticbeanstalk.com/lanoel/game',
-			data: {"gameName" : gameName}
-		}).then(function (result) {
-			refreshData($scope, $http);
-	});
 }

@@ -1,4 +1,4 @@
-lanoelApp.controller('TournamentController', function($scope, $http, $routeParams, $filter) {
+lanoelApp.controller('TournamentController', function($scope, $http, $routeParams, $filter, lanoelService) {
 	$scope.tournament = null;
 	$scope.scores = [];
 	$scope.rounds = [];
@@ -6,29 +6,26 @@ lanoelApp.controller('TournamentController', function($scope, $http, $routeParam
 
 	$scope.refresh = function()
 	{
-		$http({
-				method: 'GET',
-				url: 'http://lanoel.elasticbeanstalk.com/tournament/1',
-			}).success(function (result) {
-				$scope.tournament = result;
-				$scope.scores = $scope.tournament.scores;
+		lanoelService.getLanoelTournament().then(function (result) {
+			$scope.tournament = result;
+			$scope.scores = $scope.tournament.scores;
 
 
-				for (var i = 0; i < $scope.tournament.rounds.length ; i++)
+			for (var i = 0; i < $scope.tournament.rounds.length ; i++)
+			{
+				var tempPlaces = [];
+				for(var j = 0; j < $scope.tournament.rounds[i].places.length; j++)
 				{
-					var tempPlaces = [];
-					for(var j = 0; j < $scope.tournament.rounds[i].places.length; j++)
+					if($scope.tournament.rounds[i].places[j].place != 99)
 					{
-						if($scope.tournament.rounds[i].places[j].place != 99)
-						{
-							tempPlaces.push($scope.tournament.rounds[i].places[j]);
-						}
+						tempPlaces.push($scope.tournament.rounds[i].places[j]);
 					}
-					$scope.tournament.rounds[i].places = tempPlaces;
 				}
+				$scope.tournament.rounds[i].places = tempPlaces;
+			}
 
-				$scope.rounds = $scope.tournament.rounds;
-				$scope.selectedRound = $scope.rounds[0];
+			$scope.rounds = $scope.tournament.rounds;
+			$scope.selectedRound = $scope.rounds[0];
 		});
 	}
 
