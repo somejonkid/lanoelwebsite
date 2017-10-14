@@ -5,10 +5,10 @@
          .module('lanoel')
          .factory('lanoelService', lanoelService);
  
-         lanoelService.$inject = ['$http', '$q', '$window'];
+         lanoelService.$inject = ['$http', '$q','$sce','$location'];
 
 
-    function lanoelService($http, $q, $window) {
+    function lanoelService($http, $q, $sce, $location) {
         
         var lanoelServiceUrl = "http://lanoel.elasticbeanstalk.com";
         var loginService = "https://test.accounts.omegasixcloud.net";
@@ -18,12 +18,16 @@
         var service = {
             login: login,
             resetPassword: resetPassword,
+            getUserDetails: getUserDetails,
+            getPersonlist:getPersonlist,
             getGameOwnership: getGameOwnership,
             addGame: addGame,
             vote: vote,
             getSteamGames: getSteamGames,
             getLanoelTournament: getLanoelTournament,
-            updateLanoelScore: updateLanoelScore
+            updateLanoelScore: updateLanoelScore,
+            getTopFiveGames: getTopFiveGames,
+            getGameList: getGameList
         };
 
         return service;
@@ -38,11 +42,11 @@
                     'username' : username,
                     'password' : password
                 }
-            }).then(function (data, status, headers, config) {
-                sessionStorage.setItem('sessionid', headers("sessionid"));
+            }).then(function (response) {
+                sessionStorage.setItem('sessionid', response.headers("sessionid"));
                 defer.resolve(true);
-            }, function(data, status, headers, config) {
-                defer.reject("coult not log in");
+            }, function(response) {
+                defer.reject(logout());
             });
 
              return defer.promise;
@@ -60,7 +64,24 @@
             }).then(function(response) {
                 defer.resolve(true);
             }, function() {
-                defer.reject("password reset failed");
+                defer.reject(logout());
+            });
+            return defer.promise;
+        }
+
+        function getUserDetails() {
+            
+            var defer = $q.defer();
+            $http({
+                method: 'GET',
+                url: loginService + '/accounts/user',
+                headers : {
+                    'sessionid' : sessionStorage.getItem('sessionid')
+                }
+            }).then(function(response) {
+                defer.resolve(true);
+            }, function() {
+                defer.reject(logout());
             });
             return defer.promise;
         }
@@ -69,14 +90,42 @@
             
             var defer = $q.defer();
 
+            var serviceUrl = lanoelServiceUrl + '/lanoel/ownership';
+
+            if(gameKey){
+                serviceUrl = lanoelServiceUrl + '/lanoel/game/' + gameKey + '/ownership';
+            }
+
             $http({
                 method: 'GET',
-                url: lanoelServiceUrl + '/lanoel/game/' + gameKey + '/ownership',
+                url: serviceUrl,
                 data: { }
             }).then(function(res){
                 defer.resolve(res.data);
             }, function(){
-                defer.reject("get game ownership failed");
+                defer.reject(logout());
+            });
+            return defer.promise;
+        }
+
+        function getPersonlist() {
+            
+            var defer = $q.defer();
+
+            var serviceUrl = lanoelServiceUrl + '/lanoel/personlist'
+            $http({
+                method: 'GET',
+                url: serviceUrl,
+                data: { }
+            }).then(function(res){
+                var personList = res.data;
+                for(var person in personList)
+                {
+                    personList[person].priceToBuyTopFive = personList[person].priceToBuyTopFive / 100;
+                }
+                defer.resolve(getPeopleOrder(personList));
+            }, function(){
+                defer.reject(logout());
             });
             return defer.promise;
         }
@@ -85,12 +134,12 @@
             var defer = $q.defer();
             $http({
 				method: 'POST',
-				url: 'http://lanoel.elasticbeanstalk.com/lanoel/game/',
+				url: lanoelServiceUrl + '/lanoel/game/',
 				data: gameData
 			}).then(function(res){
-                defer.resolve(res.data);
+                defer.resolve(processGamesResult(res.data));
             }, function(){
-                defer.reject("could not add new game");
+                defer.reject(logout());
             });
             return defer.promise;
         }
@@ -99,16 +148,16 @@
             var defer = $q.defer();
             $http({
                 method: 'POST',
-                url: 'http://lanoel.elasticbeanstalk.com/lanoel/person/' + personKey + '/vote',
+                url: lanoelServiceUrl + '/lanoel/person/' + personKey + '/vote',
                 data: myVote,
                 headers : {
                     'sessionid' : sessionStorage.getItem('sessionid')
                 }
             }).then(function (result) {
-                sessionStorage.setItem('sessionid', headers("sessionid"));
-                defer.resolve(myVote);
+                sessionStorage.setItem('sessionid', result.headers("sessionid"));
+                defer.resolve(result.data);
             }, function(result){
-                defer.reject("could not vote:" + JSON.stringify(result));
+                defer.reject(logout());
             });
             return defer.promise;
         }
@@ -117,12 +166,12 @@
             var defer = $q.defer();
             $http({
                 method: 'GET',
-                url: 'http://lanoel.elasticbeanstalk.com/lanoel/steamgames',
+                url: lanoelServiceUrl + '/lanoel/steamgames',
                 data: { }
             }).then(function (result) {
                 defer.resolve(result.data);
             }, function(result){
-                defer.reject("could not get steam data: " + JSON.stringify(result.data));
+                defer.reject(logout());
             });
             return defer.promise;
         }
@@ -131,11 +180,11 @@
             var defer = $q.defer();
             $http({
                 method: 'GET',
-                url: 'http://lanoel.elasticbeanstalk.com/tournament/1',
+                url: lanoelServiceUrl + '/tournament/1',
             }).success(function (result) {
                 defer.resolve(result.data);
             }, function(result){
-                defer.reject("could not get tournament " + JSON.stringify(result));
+                defer.reject(logout());
             });
             return defer.promise;
         }
@@ -144,7 +193,7 @@
             var defer = $q.defer();
             $http({
 				method: 'POST',
-				url: 'http://lanoel.elasticbeanstalk.com/tournament/1/' + selectedRound.roundNumber + '/updateScores',
+				url: lanoelServiceUrl + '/tournament/1/' + selectedRound.roundNumber + '/updateScores',
 				headers : {
                     'sessionid' : sessionStorage.getItem('sessionid')
                 },
@@ -152,113 +201,53 @@
             }).then(function(result){
                 defer.resolve(result.data);
             }, function(result){
-                defer.reject("failed to update round: " + JSON.stringify(result.data));
+                defer.reject(logout());
             });
             return defer.promise;
-            
-            
-            success(function (data, status, headers, config) {
-				setSession(headers('sessionid'), $location);
-				document.getElementById("scorePanel").className = "panel panel-success lanoeltransition";
-				$timeout(function(){
-					document.getElementById("scorePanel").className = "panel panel-info lanoeltransition";
-				}, 1000);
-			}).error(function (data, status, headers, config) {
-				// called asynchronously if an error occurs
-				// or server returns response with an error status.
-				document.getElementById("scorePanel").className = "panel panel-error lanoeltransition";
-				$timeout(function(){
-					document.getElementById("scorePanel").className = "panel panel-info lanoeltransition";
-				}, 1000);
-				setSession(headers('sessionid'), $location);
-				clearSession();
-				$scope.$emit('Logout', $scope.user);
-				$location.path('/login');
-		});
         }
 
-        /*************private functions***********************/
+        function getTopFiveGames() {
+            
+            var defer = $q.defer();
 
-        function setPrices(lanoelObj)
-        {
-            if(lanoelObj.topFiveGames.length == 0)
-            {
-                $timeout(function()
-                {
-                    console.log("waiting for top five games to be populated");
-                }, 1000);
-            }
-    
-            for(var i = 0; i < lanoelObj.people.length; i++)
-            {
-                lanoelObj.people[i].priceToBuyTopFive = 0;
-            }
-    
-            for(var i = 0; i < lanoelObj.topFiveGames.length; i++)
-            {
-                var curgame = lanoelObj.topFiveGames[i];
-                var curOwnership = $filter('filter')(gameOwnership, {game : {gameKey : curgame.gameKey}}, true)[0];
-                
-                for(var j = 0; j < curOwnership.nonOwners.length; j++)
-                {
-                    var nonOwner = curOwnership.nonOwners[j];
-                    var person = $filter('filter')(lanoelObj.people, {personKey : nonOwner.personKey}, true)[0];
-                    if(!curgame.free)
-                    {
-                        if(curgame.steamInfo != null)
-                        {
-                            person.priceToBuyTopFive += curgame.steamInfo.price_overview == null ? 0 : curgame.steamInfo.price_overview.final / 100;
-                        }	
-                    }
-                }
-            }
-    
-            for(var i = 0; i < lanoelObj.people.length; i++)
-            {
-                lanoelObj.people[i].priceToBuyTopFive = lanoelObj.people[i].priceToBuyTopFive.toFixed(2);
-            }
-
-            return lanoelObj;
+            var serviceUrl = lanoelServiceUrl + '/lanoel/topfivegames'
+            $http({
+                method: 'GET',
+                url: serviceUrl,
+                data: { }
+            }).then(function(res){
+                defer.resolve(processGamesResult(res.data));
+            }, function(){
+                defer.reject(logout());
+            });
+            return defer.promise;
         }
 
-        function processOwnershipResult(lanoelObj)
+        function getGameList() {
+            
+            var defer = $q.defer();
+
+            var serviceUrl = lanoelServiceUrl + '/lanoel/gamelist'
+            $http({
+                method: 'GET',
+                url: serviceUrl,
+                data: { }
+            }).then(function(res){
+                defer.resolve(processGamesResult(res.data));
+            }, function(){
+                defer.reject(logout());
+            });
+            return defer.promise;
+        }
+
+        /************* "private" functions***********************/
+
+        function processGamesResult(games)
         {
-            var games = [];
-			for(var i = 0; i < result.length; i++)
-			{
-				games.push(result[i].game);
-			}
-
-			var people = [];
-			for(var i = 0; i < result[0].owners.length; i++)
-			{
-				people.push(result[0].owners[i]);
-			}
-
-			for(var i = 0; i < result[0].nonOwners.length; i++)
-			{
-				people.push(result[0].nonOwners[i]);
-			}
-
-			lanoelObj.games = games.sort(compareGames);
-            lanoelObj.games.forEach(checkSteamImage);
-            lanoelObj.games.forEach(setGameInfo);
-
-			lanoelObj.topFiveGames = [];
-
-			for(var i = 0; i < 5; i++)
-			{
-				lanoelObj.topFiveGames.push(lanoelObj.games[i]);
-			}
-
-			for(var i = 0; i < lanoelObj.topFiveGames.length; i++)
-			{
-				var game = lanoelObj.topFiveGames[i]; 
-				lanoelObj.topFiveGames[i].currentPrice = (game.free || game.steamInfo == null || game.steamInfo.price_overview == null) ? "Free!!" : "$" + game.steamInfo.price_overview.final / 100;
-			}
-
-            lanoelObj.people = people.sort(comparePeople);
-            return setPrices(lanoelObj);
+            games = games.sort(compareGames);
+            games.forEach(checkSteamImage);
+            games.forEach(setGameInfo);
+            return games;
         }
 
         function checkSteamImage(game)
@@ -266,24 +255,135 @@
             if(game.steamInfo == null)
             {
                 game.steamInfo = {};
-                game.steamInfo.header_image = 'http://dummyimage.com/600x400/000/fff&text=' + game.gameName;
+                game.steamInfo.header_image = 'http://via.placeholder.com/600x400/000000?text=' + game.gameName;
             }
         }
 
         function setGameInfo(game)
         {
-            checkSteamImage(game);
-            if(game.steamInfo.about_the_game == null)
+            var info = "<h2>I am only your memory.  I can give you no new information.</h2><br/><h3>This game is not on steam, or you typed the name wrong...</h3>";
+
+            if(game.steamInfo.about_the_game)
             {
-                game.steamInfo.about_the_game = $sce.trustAsHtml("<h2>I am only your memory.  I can give you no new information.</h2><br/><h3>This game is not on steam, or you typed the name wrong...</h3>");
+                info = game.steamInfo.about_the_game;
             }
-            else
+            game.steamInfo.about_the_game = $sce.trustAsHtml(info);
+            
+            if(!game.steamInfo.price_overview)
             {
-                game.steamInfo.about_the_game = $sce.trustAsHtml(game.steamInfo.about_the_game);
+                game.steamInfo.price_overview = {};
+                game.steamInfo.price_overview.final = 0;
+                game.steamInfo.price_overview.final = game.steamInfo.price_overview.final.toFixed(2);
+            } else{
+                game.steamInfo.price_overview.final = game.steamInfo.price_overview.final / 100;
+                if(game.free){
+                    game.steamInfo.price_overview.final = 0;
+                    game.steamInfo.price_overview.final = game.steamInfo.price_overview.final.toFixed(2);
+                }
             }
-            game.steamInfo.price_overview.final = game.steamInfo.price_overview.final / 100;
+            
             return game;
         };
 
+        function compareGames(game1, game2)
+        {
+            if(game1.voteTotal > game2.voteTotal)
+            {
+                return -1;
+            }
+            if(game1.voteTotal < game2.voteTotal)
+            {
+                return 1;
+            }
+            if(game1.numUniquePersonVotes > game2.numUniquePersonVotes)
+            {
+                return -1;
+            }
+        
+            return 1;
+        }
+        
+        function getPeopleOrder(personList)
+        {
+            getTeams(personList);
+            var groups = groupBy(personList, 'team');
+            var persons = [];
+            for(var group in groups)
+            {
+                persons.push(groups[group]["values"][0]);
+                persons.push(groups[group]["values"][1]);
+            }
+            return persons;
+        }
+        
+        function comparePlaces(place1, place2)
+        {
+            if(place1.place < place2.place)
+            {
+                return -1;
+            }
+            if(place1.place > place2.place)
+            {
+                return 1;
+            }
+            return 0;
+        }
+
+        function getTeams(people)
+        {
+            for(var person in people)
+            {
+                people[person].team = getTeamFromPerson(people[person].personName);
+            }
+        }
+        
+        function getTeamFromPerson(name)
+        {
+            switch(name)
+            {
+                case "Aaron":
+                case "Joe":
+                    return "Outtatime";
+                case "Pat":
+                case "Nick":
+                    return "Team pYREHEARTS	";
+                case "Eric":
+                case "Megan":
+                    return "The Sleigherz";
+                case "Jon":
+                case "Mitch":
+                    return "Robert Baratheon's Balls";
+                case "Bryon":
+                case "Tim":
+                    return "Team Shatner";
+                case "Ryan":
+                case "Steve":
+                    return "Team RamRod";
+                default:
+                    return "Unteamed";
+            }
+        }
+
+        function groupBy(xs, key) {
+            return xs.reduce(function(rv, x) {
+                let v = key instanceof Function ? key(x) : x[key];
+                let el = rv.find((r) => r && r.key === v);
+                if (el) {
+                    el.values.push(x);
+                } else {
+                    rv.push({
+                        key: v,
+                        values: [x]
+                    });
+                }
+                return rv;
+            }, []);
+        }
+
+        function logout()
+        {
+            sessionStorage.clear();
+            $location.path('/');
+        }
     }
 })();

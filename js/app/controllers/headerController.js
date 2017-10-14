@@ -15,6 +15,10 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		seconds : 0
 	};
 
+	$scope.$on('RefreshGames', function(event, games){
+		$scope.games = games;
+	});
+
 	$scope.$on('SetPrices', function(event, gameOwnership){
 		
 		if($scope.topFiveGames.length == 0)
@@ -60,11 +64,6 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		$location.path('/');
 	});
 
-	$scope.tableNavigateToPerson = function(person)
-	{
-		$location.path('/person/' + person.personKey);
-	};
-
 	$scope.logoutClick = function()
 	{
 		clearSession();
@@ -78,7 +77,11 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 
 	$scope.getMyAccount = function()
 	{
-		$location.path('person/' + $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0].personKey);
+		$location.path('/person');
+	}
+
+	$scope.goToGameDetails = function(gameKey) {
+		$location.path('/game').search({game: gameKey});
 	}
 
 	$scope.checkUserLogin = function()
@@ -94,7 +97,7 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 	{
 		if(inputGame == null)
 		{
-			return "http://dummyimage.com/150x50/000/fff&text=No%20Vote";
+			return "http://i.dailymail.co.uk/i/pix/2011/03/21/article-0-0B462D3300000578-837_468x286.jpg";
 		}
 		var game = $filter('filter')($scope.games, {gameName : inputGame}, true)[0];
 		if(game == undefined) return;
@@ -106,12 +109,12 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 		var text = "Time Played: ";
 		if(inputGame == null || person == null)
 		{
-			return "Probably a lot...";
+			return "";
 		}
 
 		var game = $filter('filter')($scope.games, {gameName : inputGame}, true)[0];
 		if(game == undefined) return "Cannot find game!";
-		if(game.steamGame == undefined || game.steamGame == null) return "Nobody knows!"
+		if(game.steamGame == undefined || game.steamGame == null || !person.steamInfo.steamGameList) return "Nobody knows!"
 		var playtime = $filter('filter')(person.steamInfo.steamGameList, {appid : game.steamGame.appid}, true)[0];
 		if(playtime == undefined) return text + "0 minutes!";
 
@@ -123,10 +126,11 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 	$scope.onLogin = function()
 	{
 		lanoelService.login($scope.user.username, $scope.user.password).then(function(){
-			sessionStorage.setItem('userName', "");
+			sessionStorage.setItem('userName', $scope.user.username);
 			document.getElementById("updateScoresLink").hidden = false;
 			document.getElementById("logoutLink").hidden = false;
-			$scope.selectedPerson = $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0];
+			$scope.selectedPerson = $filter('filter')($scope.people, {userName : $scope.user.username}, true)[0];
+			sessionStorage.setItem('userName', $scope.selectedPerson.userName);
 			$scope.user.username = null;
 			$scope.user.password = null;
 			$scope.$emit('Login', $scope.user);
@@ -145,7 +149,7 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 
 	$scope.onPasswordReset = function()
 	{
-		lanoelService.resetPassword($scope.email).then(function (data, status, headers, config) {
+		lanoelService.resetPassword($scope.user.email).then(function (data, status, headers, config) {
 			$location.path('/');
 		}, function() {
 			// called asynchronously if an error occurs
@@ -171,7 +175,7 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 
 	var stopTimer = $interval(function()
 	{
-		var voteEnd = new Date(2016,10,19,00,00,00);
+		var voteEnd = new Date(2017,10,31,00,00,00);
 		var diff = voteEnd.getTime() - Date.now();
 
 		var seconds = Math.floor( (diff/1000) % 60 );
@@ -187,15 +191,18 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 
 	function init() {
 		
-		lanoelService.getGameOwnership($routeParams.gameKey).then(function(result){
-			$scope.owners = result.owners;
-			$scope.nonowners = result.nonOwners;
-			$scope.games = result.games;
-			$scope.topFiveGames = result.topFiveGames;
-			$scope.people = result.people;
-			sessionStorage.personCache = JSON.stringify(people);
+		lanoelService.getGameList().then(function(result){
+			$scope.games = result;
 		});
-		getLanoelTournament();
+
+		lanoelService.getPersonlist().then(function(result){
+			$scope.people = result;
+		});
+
+		lanoelService.getTopFiveGames().then(function(result){
+			$scope.topFiveGames = result;
+		});
+
 	}
 
 	init();
@@ -203,9 +210,7 @@ lanoelApp.controller('HeaderController', function($scope, $http, $route, $routeP
 
 function clearSession()
 {
-	var tempCache = sessionStorage.personCache;
 	sessionStorage.clear();
-	sessionStorage.personCache = tempCache;
 };
 
 function logoutHandler()

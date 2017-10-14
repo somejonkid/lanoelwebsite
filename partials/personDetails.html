@@ -1,8 +1,8 @@
-<div class="container-fluid">
+<div class="container-fluid" style="background-image: url('../images/forest2.jpg'); background-size:cover;">
        <div class="row">
           <div class="col-lg-12">
                 <div class="col-lg-4">
-                  <h1 id="forms" style="margin-top:1%">{{selectedPerson.personName}}</h1>
+                  <h1 id="forms" style="margin-top:1%; color:black">{{selectedPerson.personName}}</h1>
                 </div>
                 <div class="col-lg-4">
                 </div>
@@ -11,7 +11,7 @@
           </div>
         </div>
 
-        <div class="row">
+        <div class="row" style="opacity: 0.9;">
           <div class="col-lg-6">
             <div class="well bs-component">
               <h4>Add New Games</h4>
@@ -28,7 +28,7 @@
                       <select ng-disabled="votingDisabled" class="form-control" ng-style="vote1Background" ng-model="gameVote1selection" ng-change="onGameVote1Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
                       </select>
                       <img src="../images/checkmark.png" style="width:10px;height:10px;" ng-show="gameVote1Success"/>
-                      <div ng-show="gameVote1Error">Cannot vote for single player games</div>
+                      <div ng-show="gameVote1Error">{{voteError}}</div>
                       <br>
                     </div>
                   </div>
@@ -38,7 +38,7 @@
                       <select ng-disabled="votingDisabled" class="form-control" ng-style="vote2Background" ng-model="gameVote2selection" ng-change="onGameVote2Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
                       </select>
                       <img src="../images/checkmark.png" style="width:10px;height:10px;" ng-show="gameVote2Success"/>
-                      <div ng-show="gameVote2Error">Cannot vote for single player games</div>
+                      <div ng-show="gameVote2Error">{{voteError}}</div>
                       <br>
                     </div>
                   </div>
@@ -48,7 +48,7 @@
                       <select ng-disabled="votingDisabled" class="form-control" ng-style="vote3Background" ng-model="gameVote3selection" ng-change="onGameVote3Change()" ng-options="game.gameKey as game.gameName for game in games track by game.gameKey">
                       </select>
                       <img src="../images/checkmark.png" style="width:10px;height:10px;" ng-show="gameVote3Success"/>
-                      <div ng-show="gameVote3Error">Cannot vote for single player games</div>
+                      <div ng-show="gameVote3Error">{{voteError}}</div>
                       <br>
                     </div>
                   </div>
@@ -59,15 +59,17 @@
           <div class="col-lg-4 col-lg-offset-1">
 
               <div class="panel panel-info">
-			  <div class="panel-heading">LANoel 2015 Games</div>
+        <div class="panel-heading">LANoel 2015 Games</div>
+        <div class="well bs-component">
 			  <div class="panel-body">
 				<div class="list-group" ng-repeat="game in topFiveGames">
 				  <a ng-href="/game/{{game.gameKey}}" class="list-group-item">
-					<span class="badge">{{ game.voteTotal }}</span>
+            <h3><span style="float: right;" class="label label-default">{{ game.voteTotal }}</span></h3>
 					{{ game.gameName }}
 				  </a>
 				</div>
-			  </div>
+        </div>
+        </div>
 			</div>
           </div>
         </div>

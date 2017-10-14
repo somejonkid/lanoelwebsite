@@ -1,8 +1,9 @@
-lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $filter, $timeout, lanoelService) {
-	$scope.selectedPerson = $filter('filter')(JSON.parse(sessionStorage.personCache), {userName : sessionStorage.userName}, true)[0];
+lanoelApp.controller('PersonController', function($scope, $http, $filter, $timeout, lanoelService, $q) {
+	$scope.selectedPersonUserName = sessionStorage.getItem('userName');
+
 	$scope.games = [];
 	$scope.topFiveGames = [];
-	var voteEnd = new Date(2016,10,19,00,00,00);
+	var voteEnd = new Date(2017,10,31,00,00,00);
 	$scope.votingDisabled = (voteEnd.getTime() - Date.now() < 0);
 
 	$scope.showVoteSuccessMessage = true;
@@ -14,6 +15,9 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	$scope.gameVote1Error = false;
 	$scope.gameVote2Error = false;
 	$scope.gameVote3Error = false;
+	$scope.newGameName = null;
+
+	$scope.voteError = "";
 
 	$scope.defaultBgColor = {"background-color" : "white", "transition": "background-color 500ms linear"};
 	$scope.successBgColor = {"background-color" : "#9ACD32", "transition": "background-color 500ms linear"};
@@ -56,101 +60,143 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 		$scope.gameVote3selection = {gameKey : gameselectionKey3, gameName : gameselectionName3};
 	};
 
-	$scope.goVote = function(gameKey, voteNumber)
+	$scope.goVote = function(gameKey, pointValue)
 	{
-		var myVote = {"gameKey":gameKey, "voteNumber":voteNumber}
-		lanoelService.vote($scope.selectedPerson.personKey, myVote).then(function(result){
-			var successBgColor = {}
-			if(value == 3)
+		var myVote = {"gameKey":gameKey, "voteNumber":pointValue}
+		return lanoelService.vote($scope.selectedPerson.personKey, myVote).then(function(result){
+			var voteNumber = 3;
+			if(pointValue === 2)
 			{
-				$scope.gameVote1Success = true;
-				$scope.vote1Background = $scope.successBgColor;
+				voteNumber = 2;
 			}
-			if(value == 2)
+			if(pointValue === 1)
 			{
-				$scope.gameVote2Success = true;
-				$scope.vote2Background = $scope.successBgColor;
+				voteNumber = 3;
 			}
-			if(value == 1)
-			{
-				$scope.gameVote3Success = true;
-				$scope.vote3Background = $scope.successBgColor;
-			}
-			$timeout(function(){
-				$scope.gameVote1Success = false;
-				$scope.gameVote2Success = false;
-				$scope.gameVote3Success = false;
-				$scope.vote1Background = $scope.defaultBgColor;
-				$scope.vote2Background = $scope.defaultBgColor;
-				$scope.vote3Background = $scope.defaultBgColor;
-			}, 1000);
-			refreshGameOwnership();
+			$scope.setVoteColor(voteNumber, false);
 		});
 	};
 
+	$scope.setVoteColor = function(voteNumber, error, errorText) {
+		
+		var bgColor = $scope.successBgColor;
+		if(error)
+		{
+			bgColor = $scope.errorBgColor;
+		}
+
+		if(voteNumber == 1)
+		{
+			$scope.gameVote1Success = !error;
+			$scope.vote1Background = bgColor;
+			if(error)
+			{
+				$scope.gameVote1Error = true;
+				$scope.voteError = errorText;
+			}
+		}
+		if(voteNumber == 2)
+		{
+			$scope.gameVote2Success = !error;
+			$scope.vote2Background = bgColor;
+			if(error)
+			{
+				$scope.gameVote2Error = true;
+				$scope.voteError = errorText;
+			}
+		}
+		if(voteNumber == 3)
+		{
+			$scope.gameVote3Success = !error;
+			$scope.vote3Background = bgColor;
+			if(error)
+			{
+				$scope.gameVote3Error = true;
+				$scope.voteError = errorText;
+			}
+		}
+		$timeout(function(){
+			$scope.gameVote1Success = false;
+			$scope.gameVote2Success = false;
+			$scope.gameVote3Success = false;
+			$scope.gameVote1Error = false;
+			$scope.gameVote2Error = false;
+			$scope.gameVote3Error = false;
+			$scope.vote1Background = $scope.defaultBgColor;
+			$scope.vote2Background = $scope.defaultBgColor;
+			$scope.vote3Background = $scope.defaultBgColor;
+			$scope.voteError = "";
+		}, 2000);
+		refreshGameOwnership();
+	}
+
 	$scope.onGameVote1Change = function()
 	{
-		var gameselectionObj1 = $filter('filter')($scope.games, {gameKey : $scope.gameVote1selection}, true)[0];
-		if(!validGameSelection(gameselectionObj1))
+		var gameselectionObj = $filter('filter')($scope.games, {gameKey : $scope.gameVote1selection}, true)[0];
+		if(!$scope.validateGameSelection(gameselectionObj,1))
 		{
-			$scope.vote1Background = $scope.errorBgColor;
-			$scope.gameVote1Error = true;
-			$timeout(function(){
-				$scope.vote1Background = $scope.defaultBgColor;
-				$scope.gameVote1Error = false;
-				$scope.setVoteFields();
-			}, 1000);
+			$scope.setVoteFields();
 			return;
 		}
-		
-		$scope.gameVote1selection = {gameKey : gameselectionObj1.gameKey, gameName : gameselectionObj1.gameName};
-		$scope.selectedPerson.gameVote3 = gameselectionObj1.gameName;
-		$scope.goVote($scope.gameVote1selection.gameKey, 3);
+		$scope.goVote(gameselectionObj.gameKey, 3).then(function(result){
+			$scope.setVoteResults(result);
+			$scope.setVoteFields();
+		});
 	}
 
 	$scope.onGameVote2Change = function()
 	{
-		var gameselectionObj2 = $filter('filter')($scope.games, {gameKey : $scope.gameVote2selection}, true)[0];
-		if(!validGameSelection(gameselectionObj2))
+		var gameselectionObj = $filter('filter')($scope.games, {gameKey : $scope.gameVote2selection}, true)[0];
+		if(!$scope.validateGameSelection(gameselectionObj,2))
 		{
-			$scope.gameVote2Error = true;
-			$scope.vote2Background = $scope.errorBgColor;
-			$timeout(function(){
-				$scope.vote2Background = $scope.defaultBgColor;
-				$scope.gameVote2Error = false;
-				$scope.setVoteFields();
-			}, 1000);
+			$scope.setVoteFields();
 			return;
 		}
-
-		$scope.gameVote2selection = {gameKey : gameselectionObj2.gameKey, gameName : gameselectionObj2.gameName};
-		$scope.selectedPerson.gameVote2 = gameselectionObj2.gameName;
-		$scope.goVote($scope.gameVote2selection.gameKey, 2);
+		$scope.goVote(gameselectionObj.gameKey, 2).then(function(result){
+			$scope.setVoteResults(result);
+			$scope.setVoteFields();
+		});
 	}
 
 	$scope.onGameVote3Change = function()
 	{
-		var gameselectionObj3 = $filter('filter')($scope.games, {gameKey : $scope.gameVote3selection}, true)[0];
-		if(!validGameSelection(gameselectionObj3))
+		var gameselectionObj = $filter('filter')($scope.games, {gameKey : $scope.gameVote3selection}, true)[0];
+		if(!$scope.validateGameSelection(gameselectionObj,3))
 		{
-			$scope.gameVote3Error = true;
-			$scope.vote3Background = $scope.errorBgColor;
-			$timeout(function(){
-				$scope.vote3Background = $scope.defaultBgColor;
-				$scope.gameVote3Error = false;
-				$scope.setVoteFields();
-			}, 1000);
+			$scope.setVoteFields();
 			return;
 		}
-		
-		$scope.gameVote3selection = {gameKey : gameselectionObj3.gameKey, gameName : gameselectionObj3.gameName};
-		$scope.selectedPerson.gameVote1 = gameselectionObj3.gameName;
-		$scope.goVote($scope.gameVote3selection.gameKey, 1);
+		$scope.goVote(gameselectionObj.gameKey, 1).then(function(result){
+			$scope.setVoteResults(result);
+			$scope.setVoteFields();
+		});
+	}
+
+	$scope.setVoteResults = function(result){
+		for(var vote in result)
+		{
+			if(result[vote].voteNumber === 1)
+			{
+				$scope.gameVote1selection = $filter('filter')($scope.games, {gameKey : result[vote].gameKey}, true)[0];
+				$scope.selectedPerson.gameVote1 = $scope.gameVote1selection;
+			}
+			if(result[vote].voteNumber === 2)
+			{
+				$scope.gameVote2selection = $filter('filter')($scope.games, {gameKey : result[vote].gameKey}, true)[0];
+				$scope.selectedPerson.gameVote2 = $scope.gameVote2selection;
+			}
+			if(result[vote].voteNumber === 3)
+			{
+				$scope.gameVote3selection = $filter('filter')($scope.games, {gameKey : result[vote].gameKey}, true)[0];
+				$scope.selectedPerson.gameVote3 = $scope.gameVote3selection;
+			}
+		}
 	}
 
 	$scope.addNewGame = function(name)
 	{
-		lanoelService.addGame({"gameName" : gameName}).then(function(){
+		lanoelService.addGame({"gameName" : name}).then(function(){
+			$scope.newGameName = null;
 			refreshGameOwnership();
 		});
 	};
@@ -162,45 +208,67 @@ lanoelApp.controller('PersonController', function($scope, $http, $routeParams, $
 	}
 
 	function refreshGameOwnership() {
-		lanoelService.getGameOwnership($routeParams.gameKey).then(function(result){
-			$scope.owners = result.owners;
-			$scope.nonowners = result.nonOwners;
-			$scope.games = result.games;
-			$scope.topFiveGames = result.topFiveGames;
-			$scope.people = result.people;
-			sessionStorage.personCache = JSON.stringify(people);
+		var promises = [];
+		promises.push(lanoelService.getGameList().then(function(result){
+			$scope.games = result;
+		}));
+
+		promises.push(lanoelService.getPersonlist().then(function(result){
+			$scope.people = result;
+			$scope.selectedPerson = $filter('filter')($scope.people, {userName : $scope.selectedPersonUserName}, true)[0];
+		}));
+
+		promises.push(lanoelService.getTopFiveGames().then(function(result){
+			$scope.topFiveGames = result;
+		}));
+
+		$q.all(promises).then(function(){
+			$scope.setVoteFields();
+			$scope.$emit('RefreshGames', $scope.games);
 		});
 	}
 
+	$scope.validateGameSelection = function(selectedGame, voteNumber)
+	{
+		if(selectedGame.gameName === $scope.gameVote1selection.gameName ||
+			selectedGame.gameName === $scope.gameVote2selection.gameName ||
+			selectedGame.gameName === $scope.gameVote3selection.gameName) {
+				$scope.setVoteColor(voteNumber, true, "Cannot vote for the same game more than once");
+				return false;
+		}
+		if(selectedGame == null || selectedGame.steamInfo == null || selectedGame.steamInfo.categories == null)
+		{
+			return true;
+		}
+		var hasSinglePlayer = false;
+		var hasMultiPlayer = false;
+		for(var i = 0; i < selectedGame.steamInfo.categories.length; i++)
+		{
+			var desc = selectedGame.steamInfo.categories[i].description.toUpperCase();
+			if(desc.includes("MULTI") && desc.includes("PLAYER"))
+			{
+				hasMultiPlayer = true;
+			}
+	
+			if(desc.includes("SINGLE") && desc.includes("PLAYER"))
+			{
+				hasSinglePlayer = true;
+			}
+		}
+	
+		if(hasSinglePlayer && !hasMultiPlayer){
+			$scope.setVoteColor(voteNumber, true, "Cannot vote for a single player game");
+			return false;
+		}
+		return true;
+	}
+
 	function init() {
-		refreshGameOwnership();
-		refreshSteamGameList();
+		lanoelService.getUserDetails().then(function(){
+			refreshGameOwnership();
+			refreshSteamGameList();
+		});
 	}
 
 	init();
 });
-
-function validGameSelection(selectedGame)
-{
-	if(selectedGame == null || selectedGame.steamInfo == null || selectedGame.steamInfo.categories == null)
-	{
-		return true;
-	}
-	var hasSinglePlayer = false;
-	var hasMultiPlayer = false;
-	for(var i = 0; i < selectedGame.steamInfo.categories.length; i++)
-	{
-		var desc = selectedGame.steamInfo.categories[i].description.toUpperCase();
-		if(desc.includes("MULTI") && desc.includes("PLAYER"))
-		{
-			hasMultiPlayer = true;
-		}
-
-		if(desc.includes("SINGLE") && desc.includes("PLAYER"))
-		{
-			hasSinglePlayer = true;
-		}
-	}
-
-	return (hasSinglePlayer && !hasMultiPlayer) ? false : true;
-}

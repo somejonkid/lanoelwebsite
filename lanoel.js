@@ -10,18 +10,18 @@ lanoelApp.config(['$routeProvider', '$locationProvider', function($routeProvider
 		})
 
 		// route for the about page
-		.when('/game/:gameKey', {
+		.when('/game', {
 			templateUrl : '/partials/gameDetails.html',
 			controller  : 'GameController'
 		})
 
 		// route for the contact page
-		.when('/person/:personKey', {
+		.when('/person', {
 			templateUrl : '/partials/personDetails.html',
 			controller  : 'PersonController'
 		})
 
-		.when('/tournament', {
+		.when('/tournaments', {
 			templateUrl : '/partials/tournament.html',
 			controller  : 'TournamentController'
 		})
@@ -50,51 +50,3 @@ lanoelApp.config(['$routeProvider', '$locationProvider', function($routeProvider
 				requireBase: false
 			 });
 }]);
-
-lanoelApp.controller('MainController', function($scope) {
-	$scope.message = 'Look! I am an about page.';
-});
-
-function compareGames(game1, game2)
-{
-	if(game1.voteTotal > game2.voteTotal)
-	{
-		return -1;
-	}
-	if(game1.voteTotal < game2.voteTotal)
-	{
-		return 1;
-	}
-	if(game1.numUniquePersonVotes > game2.numUniquePersonVotes)
-	{
-		return -1;
-	}
-
-	return 1;
-}
-
-function comparePeople(person1, person2)
-{
-	if(person1.personName < person2.personName)
-	{
-		return -1;
-	}
-	if(person1.personName > person2.personName)
-	{
-		return 1;
-	}
-	return 0;
-}
-
-function comparePlaces(place1, place2)
-{
-	if(place1.place < place2.place)
-	{
-		return -1;
-	}
-	if(place1.place > place2.place)
-	{
-		return 1;
-	}
-	return 0;
-}

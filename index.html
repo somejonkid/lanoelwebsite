@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>LANOEL2016!</title>
+    <title>LANOEL!</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -51,16 +51,13 @@
               <a class="dropdown-toggle" data-toggle="dropdown" href="" id="themes">Games<span class="caret"></span></a>
               <ul style="overflow-y:auto; max-height:600px" class="dropdown-menu" aria-labelledby="themes">
 				<li ng-repeat="game in games">
-					<a href="/game/{{game.gameKey}}"><img ng-src="{{game.steamInfo.header_image}}" width="250" height="80" /></a>
+					<a ng-click="goToGameDetails(game.gameKey)"><img ng-src="{{game.steamInfo.header_image}}" width="250" height="80" /></a>
 				</li>
               </ul>
             </li>
-            <li>
-              <a href="https://twitter.com/hashtag/makelanoelgreatagain">Twitter Integration</a>
-            </li>
-			<li>
-              <a href="/tournament">Tournament</a>
-            </li>
+			  <!--<li>
+            <a href="/tournaments">Tournaments</a>
+        </li>-->
           </ul>
 		  <ul class="nav navbar-nav navbar-right" id="accountList">
 			<li ng-show="!checkUserLogin()" id="loginLink"><a style="cursor:pointer" data-toggle="modal" data-target="#myModal">Login</a></li>
