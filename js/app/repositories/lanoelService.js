@@ -346,7 +346,7 @@
                     return "Outtatime";
                 case "Pat":
                 case "Nick":
-                    return "Team pYREHEARTS	";
+                    return "Majestic AF";
                 case "Eric":
                 case "Megan":
                     return "The Sleigherz";
