@@ -3,7 +3,7 @@ lanoelApp.controller('PersonController', function($scope, $http, $filter, $timeo
 
 	$scope.games = [];
 	$scope.topFiveGames = [];
-	var voteEnd = new Date(2017,10,31,00,00,00);
+	var voteEnd = new Date(2017,10,05,00,00,00);
 	$scope.votingDisabled = (voteEnd.getTime() - Date.now() < 0);
 
 	$scope.showVoteSuccessMessage = true;
